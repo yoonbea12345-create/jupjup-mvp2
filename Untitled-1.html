@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>줍줍 - 결제 비서 MVP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f6f7f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #ffcc00;
+      border: none;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    #result {
+      margin-top: 24px;
+      padding: 20px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .highlight {
+      color: #ff9900;
+      font-weight: bold;
+    }
+
+    .reason {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>줍줍 결제 추천</h1>
+
+    <!-- 카드사 선택 -->
+    <select id="cardCompany">
+      <option value="신한카드">신한카드</option>
+      <option value="국민카드">국민카드</option>
+      <option value="현대카드">현대카드</option>
+    </select>
+
+    <!-- 전월 실적 -->
+    <select id="performance">
+      <option value="30">전월 30만원 이상</option>
+      <option value="50">전월 50만원 이상</option>
+      <option value="100">전월 100만원 이상</option>
+    </select>
+
+    <!-- 결제 업종 -->
+    <select id="category">
+      <option value="음식점">음식점</option>
+      <option value="카페">카페</option>
+      <option value="편의점">편의점</option>
+    </select>
+
+    <button onclick="recommendCard()">추천받기</button>
+
+    <div id="result">결제 전 추천 결과가 표시됩니다.</div>
+  </div>
+
+  <script>
+    /* ===== 카드 혜택 데이터 (모델링된 구조) ===== */
+    const cards = [
+      {
+        name: "신한 딥드림",
+        company: "신한카드",
+        categories: ["카페", "음식점"],
+        benefitType: "할인",
+        discount: 10,
+        minPerformance: 30,
+        monthlyLimit: 10000
+      },
+      {
+        name: "국민 청춘대로",
+        company: "국민카드",
+        categories: ["음식점"],
+        benefitType: "캐시백",
+        discount: 15,
+        minPerformance: 50,
+        monthlyLimit: 15000
+      },
+      {
+        name: "현대 Zero",
+        company: "현대카드",
+        categories: ["카페", "편의점", "음식점"],
+        benefitType: "할인",
+        discount: 5,
+        minPerformance: 0,
+        monthlyLimit: 0
+      }
+    ];
+
+    function recommendCard() {
+      const company = document.getElementById("cardCompany").value;
+      const performance = Number(document.getElementById("performance").value);
+      const category = document.getElementById("category").value;
+
+      let bestCard = null;
+      let bestScore = 0;
+      let reasons = [];
+
+      for (let card of cards) {
+        let score = 0;
+        let tempReasons = [];
+
+        if (card.company === company) {
+          score += 20;
+          tempReasons.push("보유 카드사 일치");
+        }
+
+        if (card.categories.includes(category)) {
+          score += 50;
+          tempReasons.push(`${category} 업종 혜택 적용`);
+        }
+
+        if (performance >= card.minPerformance) {
+          score += card.discount;
+          tempReasons.push("전월 실적 조건 충족");
+        } else {
+          tempReasons.push("전월 실적 미충족");
+        }
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestCard = card;
+          reasons = tempReasons;
+        }
+      }
+
+      if (bestCard) {
+        document.getElementById("result").innerHTML =
+          `<span class="highlight">추천 카드: ${bestCard.name}</span><br>
+          예상 혜택: ${bestCard.discount}% ${bestCard.benefitType}<br>
+          월 혜택 한도: ${bestCard.monthlyLimit ? bestCard.monthlyLimit.toLocaleString() + "원" : "제한 없음"}
+          <div class="reason">✔ ${reasons.join("<br>✔ ")}</div>`;
+      } else {
+        document.getElementById("result").innerText = "추천할 카드가 없습니다.";
+      }
+    }
+
+    /* ===== QR 코드용 자동 업종 인식 ===== */
+    const params = new URLSearchParams(window.location.search);
+    const autoCategory = params.get("category");
+    if (autoCategory) {
+      document.getElementById("category").value = autoCategory;
+    }
+  </script>
+</body>
+</html>
