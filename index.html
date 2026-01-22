@@ -3,57 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>줍줍(JUPJUP) - 나만의 결제 비서</title>
-  <meta name="description" content="결제 직전, 가장 유리한 결제수단을 추천하는 줍줍(JUPJUP)" />
-
+  <title>줍줍(JUPJUP) - 스마트 결제 비서</title>
   <style>
     :root {
-      --bg: #f8f9fc;
-      --card: #ffffff;
-      --text: #101828;
-      --muted: #475467;
-      --line: #eaecf0;
-
-      /* 브랜드 컬러: 도파민 오렌지 조합 */
-      --brand: #FF6B00;
-      --brand-weak: #fff1e6;
-      --brand-dark: #E66000;
+      /* 당근 느낌 제거: 붉은기 뺀 세련된 네온 앰버 */
+      --brand: #FFB800; 
+      --brand-dark: #E5A500;
+      --brand-weak: #FFF8E6;
       
-      --shadow: 0 12px 16px -4px rgba(16, 24, 40, 0.08);
-      --radius: 20px;
+      /* 금융 신뢰감을 주는 딥 네이비 */
+      --navy: #0F172A;
+      --bg: #F1F5F9;
+      --card: #ffffff;
+      --text: #1E293B;
+      --muted: #64748B;
+      --line: #E2E8F0;
+      
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --radius: 16px;
 
-      --ok: #027a48;
-      --ok-bg: #ecfdf3;
-      --warn: #b44d12;
-      --warn-bg: #fffaeb;
-      --bad: #b42318;
-      --bad-bg: #fef3f2;
-
-      /* 스플래시 배경 */
-      --splash-top: #FF6B00;
-      --splash-bottom: #FF8533;
+      --ok: #10B981;
+      --ok-bg: #ECFDF5;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Noto Sans KR", sans-serif;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Pretendard", "Noto Sans KR", sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
-    /* ===== Splash ===== */
+    /* ===== Splash: 네이비 톤으로 무게감 부여 ===== */
     .splash {
       position: fixed;
       inset: 0;
-      background: linear-gradient(180deg, var(--splash-top) 0%, var(--splash-bottom) 100%);
+      background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
       opacity: 1;
-      transition: opacity 400ms ease;
+      transition: opacity 500ms ease;
     }
     .splash.fade-out { opacity: 0; pointer-events: none; }
 
@@ -61,27 +53,20 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
-      text-align: center;
+      gap: 20px;
     }
 
     .splash img {
-      width: 140px;
-      height: 140px;
-      object-fit: contain;
-      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
+      width: 120px;
+      height: 120px;
+      filter: drop-shadow(0 0 20px rgba(255, 184, 0, 0.4));
     }
 
     .splash-title {
       font-weight: 900;
-      font-size: 28px;
-      color: white;
-      letter-spacing: -0.04em;
-    }
-    .splash-subtitle {
-      font-weight: 600;
-      font-size: 14px;
-      color: rgba(255,255,255,0.9);
+      font-size: 32px;
+      color: var(--brand); /* 글씨는 금색 느낌 */
+      letter-spacing: 0.05em;
     }
 
     /* ===== Header ===== */
@@ -89,284 +74,180 @@
       position: sticky;
       top: 0;
       z-index: 50;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--line);
     }
     .header-inner {
-      max-width: 600px;
+      max-width: 500px;
       margin: 0 auto;
-      padding: 12px 16px;
+      padding: 14px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .brand img { width: 28px; height: 28px; object-fit: contain; }
-    .brand .name {
-      font-weight: 800;
-      font-size: 18px;
-      color: var(--brand);
-      letter-spacing: -0.02em;
-    }
+    .brand { display: flex; align-items: center; gap: 8px; }
+    .brand img { width: 24px; height: 24px; }
+    .brand .name { font-weight: 800; font-size: 18px; color: var(--navy); }
 
-    main {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px 16px;
-    }
-    .stack { display: flex; flex-direction: column; gap: 16px; }
+    main { max-width: 500px; margin: 0 auto; padding: 20px 16px; }
+    .stack { display: flex; flex-direction: column; gap: 20px; }
 
-    /* ===== UI Elements ===== */
+    /* ===== UI Components ===== */
     .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
+      background: var(--navy);
+      color: white;
+      padding: 8px 16px;
       border-radius: 999px;
-      background: white;
-      border: 1px solid var(--line);
-      font-size: 14px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-    }
-    .pill .dot { width: 8px; height: 8px; background: var(--brand); border-radius: 50%; }
-
-    .notice {
-      background: var(--brand-weak);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: var(--brand-dark);
       font-size: 13px;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
+    .pill .dot { width: 6px; height: 6px; background: var(--brand); border-radius: 50%; }
 
     .panel {
       background: var(--card);
-      border: 1px solid var(--line);
       border-radius: var(--radius);
+      padding: 24px;
       box-shadow: var(--shadow);
-      padding: 20px;
+      border: 1px solid white;
     }
-    .panel h2 { margin: 0 0 16px; font-size: 15px; font-weight: 700; color: var(--muted); }
+    .panel h2 { margin: 0 0 16px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
-    .form-grid { display: flex; flex-direction: column; gap: 16px; }
-    label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    label { display: block; font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
     select, input {
       width: 100%;
       padding: 14px;
       border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #fff;
+      border: 2px solid var(--line);
       font-size: 15px;
-      outline: none;
+      font-weight: 500;
       transition: all 0.2s;
     }
-    select:focus, input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-weak); }
+    select:focus, input:focus { border-color: var(--navy); outline: none; background: #fff; }
 
-    .btn {
+    .btn.primary {
       width: 100%;
+      background: var(--navy);
+      color: white;
       border: none;
+      padding: 18px;
       border-radius: 14px;
-      padding: 16px;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 16px;
       cursor: pointer;
-      transition: 0.2s;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
     }
-    .btn.primary { background: var(--brand); color: white; margin-top: 8px; }
-    .btn.primary:active { background: var(--brand-dark); transform: scale(0.98); }
-    .btn.ghost { background: transparent; color: var(--muted); padding: 8px; font-size: 14px; }
+    .btn.primary span { color: var(--brand); } /* 버튼 내 강조색 */
 
-    /* ===== Result Cards ===== */
+    /* ===== Recommendation Cards ===== */
     .rec-card {
-      position: relative;
       border-radius: var(--radius);
       background: white;
-      border: 1px solid var(--line);
       padding: 20px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      border: 1px solid var(--line);
     }
     .rec-card.top {
-      border: 2px solid var(--brand);
-      background: linear-gradient(180deg, #fff 0%, #fff9f5 100%);
-      box-shadow: 0 10px 20px rgba(255,107,0,0.1);
+      border: 2px solid var(--navy);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
     .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 6px;
+      background: var(--brand);
+      color: var(--navy);
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 900;
       margin-bottom: 12px;
+      display: inline-block;
     }
-    .badge.ok { background: var(--ok-bg); color: var(--ok); }
-    .badge.warn { background: var(--warn-bg); color: var(--warn); }
-    .badge.bad { background: var(--bad-bg); color: var(--bad); }
-
-    .rec-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
-    .rec-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
-    
-    .benefit-highlight {
+    .rec-title { font-size: 18px; font-weight: 800; color: var(--navy); }
+    .benefit-tag {
+      margin-top: 12px;
       background: var(--brand-weak);
-      color: var(--brand);
       padding: 12px;
-      border-radius: 12px;
+      border-radius: 10px;
       font-weight: 700;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      color: #926A00;
+      border-left: 4px solid var(--brand);
     }
-    .wm { position: absolute; right: 16px; top: 16px; width: 40px; opacity: 0.05; pointer-events: none; }
-
-    .footnote { font-size: 12px; color: #98a2b3; margin-top: 12px; text-align: center; }
   </style>
 </head>
-
 <body>
   <div class="splash" id="splash">
     <div class="splash-content">
-      <img src="logo1.png" alt="줍줍" />
+      <img src="logo1.png" alt="JUPJUP" />
       <div class="splash-title">JUPJUP</div>
-      <div class="splash-subtitle">결제 전, 1초의 기적</div>
     </div>
   </div>
 
   <header>
     <div class="header-inner">
       <div class="brand">
-        <img src="./logo3.png" alt="로고" />
+        <img src="logo3.png" alt="L" />
         <div class="name">JUPJUP</div>
       </div>
-      <div style="font-size:12px; color:var(--muted); font-weight:600;">스마트 결제 비서</div>
+      <div style="font-size:11px; font-weight:700; color:var(--muted)">SMART PAY ASSISTANT</div>
     </div>
   </header>
 
   <main>
     <div class="stack">
-      <div id="storeWrap" style="display:none;">
-        <div class="pill">
-          <span class="dot"></span>
-          <strong id="storeName">-</strong> 에서 줍줍 준비 완료!
-        </div>
-      </div>
-
-      <div id="qrNotice" class="notice" style="display:none;">
-        📍 QR 인식 결과, 최적의 혜택을 불러왔습니다.
+      <div id="storeWrap" style="display:none; text-align:center;">
+        <div class="pill"><span class="dot"></span> <span id="storeName"></span>에서 줍줍 가동 중</div>
       </div>
 
       <section class="panel">
-        <h2>어디서 결제하시나요?</h2>
-        <div class="form-grid">
+        <h2>Payment Info</h2>
+        <div style="display:flex; flex-direction:column; gap:16px;">
           <div>
-            <label>업종 선택</label>
+            <label>CATEGORY</label>
             <select id="categorySelect">
-              <option value="">업종 선택</option>
+              <option value="">카테고리 선택</option>
               <option value="카페">☕ 카페/디저트</option>
               <option value="음식점">🍱 음식점/식당</option>
               <option value="편의점">🏪 편의점/마트</option>
-              <option value="대중교통">🚌 대중교통</option>
               <option value="온라인">💻 온라인 쇼핑</option>
-              <option value="기타">ETC 기타</option>
             </select>
           </div>
-          <div>
-            <label>결제 금액 (예상)</label>
-            <input id="amountInput" type="number" pattern="\[0-9]*" inputmode="numeric" placeholder="금액을 입력하면 정확한 혜택 계산이 가능해요" />
-          </div>
+          <button class="btn primary" id="btnRecommend">결제 혜택 <span>줍줍하기</span></button>
         </div>
-        <button class="btn primary" id="btnRecommend">혜택 비교하기</button>
-        <button class="btn ghost" id="btnReset">다시 선택하기</button>
       </section>
 
-      <section class="panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <h2 style="margin:0;">추천 카드 랭킹</h2>
-          <span id="resultSub" style="font-size:12px; color:var(--brand); font-weight:600;"></span>
-        </div>
-        <div id="results">
-          <div style="text-align:center; padding:40px 0; color:#98a2b3; font-size:14px;">
-            업종을 선택하고 버튼을 눌러주세요!
-          </div>
-        </div>
-        <div class="footnote">
-          본 데이터는 MVP 테스트용 가상 데이터입니다.<br/>실제 마이데이터 연동 시 실시간 혜택이 적용됩니다.
-        </div>
-      </section>
+      <div id="results"></div>
     </div>
   </main>
 
   <script>
-    // Splash logic
     window.addEventListener('load', () => {
       setTimeout(() => {
         const s = document.getElementById('splash');
         s.classList.add('fade-out');
-        setTimeout(() => s.style.display = 'none', 400);
-      }, 900);
+        setTimeout(() => s.style.display = 'none', 500);
+      }, 1000);
     });
-
-    const params = new URLSearchParams(window.location.search);
-    const pStore = decodeURIComponent(params.get('store') || '').trim();
-    const pCategory = params.get('category') || '';
 
     const categorySelect = document.getElementById('categorySelect');
-    const storeName = document.getElementById('storeName');
-    const storeWrap = document.getElementById('storeWrap');
-    const qrNotice = document.getElementById('qrNotice');
-    const amountInput = document.getElementById('amountInput');
     const resultsEl = document.getElementById('results');
-    const resultSub = document.getElementById('resultSub');
 
-    if (pStore) { storeName.textContent = pStore; storeWrap.style.display = 'block'; }
-    if (pCategory) { categorySelect.value = pCategory; qrNotice.style.display = 'block'; }
-
-    const dummyCards = [
-      { issuer: "신한", name: "신한 Deep Dream", score: 95, benefit: "카페 10% 적립 (최대 5천원)", note: "실적 충족 · 웰컴 혜택 적용 중" },
-      { issuer: "국민", name: "KB 해피포인트", score: 72, benefit: "편의점 8% 할인", note: "실적 미달 (14만원 부족)" },
-      { issuer: "현대", name: "현대 카드 ZERO", score: 60, benefit: "모든 가맹점 1% 할인", note: "무조건 혜택 적용" }
+    const dummy = [
+      { name: "신한 Deep Dream", score: 98, benefit: "전 가맹점 0.7% + 편의점 2.1% 적립" },
+      { name: "현대카드 ZERO", score: 85, benefit: "조건 없는 0.7% 할인 + 생활영역 1.5%" }
     ];
 
-    function renderResults() {
-      const cat = categorySelect.value;
-      if (!cat) return;
-
-      resultsEl.innerHTML = "";
-      resultSub.textContent = cat + " 카테고리 분석 중...";
-
-      dummyCards.forEach((card, idx) => {
-        const cls = idx === 0 ? "top" : "";
-        const badgeCls = card.score >= 80 ? "ok" : (card.score >= 60 ? "warn" : "bad");
-        const badgeLabel = card.score >= 80 ? "최적 혜택" : "일반 혜택";
-
-        const div = document.createElement('div');
-        div.className = `rec-card ${cls}`;
-        div.innerHTML = `
-          <div class="badge ${badgeCls}">${idx+1}순위 · ${badgeLabel} (${card.score}점)</div>
+    document.getElementById('btnRecommend').addEventListener('click', () => {
+      if(!categorySelect.value) return;
+      resultsEl.innerHTML = dummy.map((card, i) => `
+        <div class="rec-card ${i===0?'top':''}">
+          <div class="badge">${i+1}ST RANK</div>
           <div class="rec-title">${card.name}</div>
-          <div class="rec-meta">${card.issuer}카드 | ${card.note}</div>
-          <div class="benefit-highlight">
-            💰 ${card.benefit}
-          </div>
-          <img src="logo3.png" class="wm" alt="" />
-        `;
-        resultsEl.appendChild(div);
-      });
-    }
-
-    document.getElementById('btnRecommend').addEventListener('click', renderResults);
-    document.getElementById('btnReset').addEventListener('click', () => {
-      categorySelect.value = "";
-      amountInput.value = "";
-      resultsEl.innerHTML = '<div style="text-align:center; padding:40px 0; color:#98a2b3; font-size:14px;">업종을 선택하고 버튼을 눌러주세요!</div>';
-      resultSub.textContent = "";
+          <div class="benefit-tag">💰 ${card.benefit}</div>
+        </div>
+      `).join('');
     });
-
-    if (pCategory) renderResults();
   </script>
 </body>
 </html>
