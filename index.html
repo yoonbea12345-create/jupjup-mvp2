@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>줍줍 - 결제 비서 MVP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- 1) 앱 아이콘(파비콘/홈화면 아이콘) -->
-  <link rel="icon" type="image/png" href="logo.png">
-  <link rel="apple-touch-icon" href="logo.png">
+  <!-- (1) 앱 아이콘용 -->
+  <link rel="icon" type="image/png" href="logo1.png" />
+  <link rel="apple-touch-icon" href="logo1.png" />
 
   <style>
     :root{
@@ -26,7 +26,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
       background: linear-gradient(135deg, var(--bg1), var(--bg2));
       margin: 0;
-      padding: 0;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -46,11 +45,10 @@
       border-radius: var(--radius);
       padding: 22px;
       box-shadow: var(--shadow);
-      position: relative;
       overflow: hidden;
     }
 
-    /* 3) 웹 헤더 */
+    /* ===== (3) 웹 헤더 로고 ===== */
     .app-header{
       margin-bottom: 14px;
     }
@@ -60,12 +58,10 @@
       gap: 10px;
     }
     .header-logo{
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.10);
-      background: white;
-      object-fit: cover;
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
     }
     .app-name{
       font-size: 20px;
@@ -80,12 +76,13 @@
       line-height: 1.4;
     }
 
+    /* QR 자동 업종 확인 박스 */
     .confirm-box{
       background: rgba(255,255,255,0.85);
       border-radius: 14px;
       padding: 12px 14px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      margin: 12px 0 8px;
+      margin: 12px 0 10px;
     }
     .confirm-title{
       font-weight: 900;
@@ -168,14 +165,13 @@
       line-height: 1.55;
     }
 
-    /* 업종 변경 클릭 시 강조 */
     .pulse {
       outline: 3px solid rgba(255,153,0,0.35);
       box-shadow: 0 0 0 6px rgba(255,153,0,0.18);
       transition: box-shadow 0.2s ease;
     }
 
-    /* 2) 스플래시(첫 진입 오버레이) */
+    /* ===== (2) 스플래시 오버레이 ===== */
     .splash{
       position: fixed;
       inset: 0;
@@ -190,19 +186,18 @@
       padding: 24px;
     }
     .splash-logo{
-      width: 140px;
-      height: 140px;
-      border-radius: 28px;
-      background: white;
-      object-fit: cover;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.15);
-      margin-bottom: 18px;
+      width: 220px;
+      max-width: 75vw;
+      height: auto;
+      display: block;
+      margin: 0 auto 14px;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.18));
     }
     .splash-title{
       margin: 0;
       font-size: 28px;
       font-weight: 900;
-      color: var(--text);
+      color: #1f2937;
       letter-spacing: -0.3px;
     }
     .splash-tagline{
@@ -221,10 +216,10 @@
 </head>
 
 <body>
-  <!-- 스플래시 오버레이 -->
+  <!-- 스플래시 (logo2) -->
   <div class="splash" id="splash">
     <div class="splash-inner">
-      <img src="logo.png" alt="줍줍 로고" class="splash-logo">
+      <img src="logo2.png" alt="줍줍 스플래시" class="splash-logo" />
       <h1 class="splash-title">줍줍</h1>
       <p class="splash-tagline">나만의 결제 비서</p>
     </div>
@@ -232,16 +227,16 @@
 
   <div class="container">
     <div class="panel">
-      <!-- 웹 헤더 -->
+      <!-- 헤더 (logo3) -->
       <header class="app-header">
         <div class="logo-wrap">
-          <img src="logo.png" alt="줍줍 로고" class="header-logo">
+          <img src="logo3.png" alt="줍줍 로고" class="header-logo" />
           <div class="app-name">줍줍</div>
         </div>
         <div class="subtitle">결제 직전, 가장 유리한 결제수단을 추천합니다.</div>
       </header>
 
-      <!-- QR로 들어온 경우: 업종 확인 박스 -->
+      <!-- QR 자동 업종 박스 -->
       <div class="confirm-box" id="confirmBox" style="display:none;">
         <p class="confirm-title" id="confirmTitle">선택된 업종이 맞나요?</p>
         <p class="confirm-desc">
@@ -281,7 +276,7 @@
   </div>
 
   <script>
-    // 스플래시: 900ms 후 자연스럽게 사라지게 처리
+    // 스플래시: 로딩 후 900ms 뒤 제거
     window.addEventListener("load", () => {
       const splash = document.getElementById("splash");
       setTimeout(() => {
@@ -336,7 +331,7 @@
          <div class="reason">✔ ${reasons.join("<br>✔ ")}</div>`;
     }
 
-    // 업종 자동 선택(업종별 QR용)
+    // QR 자동 업종 선택
     const params = new URLSearchParams(window.location.search);
     const autoCategory = params.get("category");
     const from = params.get("from");
@@ -359,17 +354,9 @@
       const el = document.getElementById("category");
       el.scrollIntoView({ behavior: "smooth", block: "center" });
       el.focus();
-
       el.classList.add("pulse");
       setTimeout(() => el.classList.remove("pulse"), 800);
     }
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
