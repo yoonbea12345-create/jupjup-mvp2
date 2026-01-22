@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>줍줍(JUPJUP) - 나만의 결제 비서</title>
-  <meta name="description" content="결제 직전, 가장 유리한 카드 추천. 줍줍(JUPJUP) 나만의 결제 비서" />
+  <meta name="description" content="결제 직전, 가장 유리한 결제수단을 추천하는 줍줍(JUPJUP)" />
 
   <style>
     :root{
@@ -33,7 +33,7 @@
     }
 
     /* ===== Splash ===== */
-    .splash {
+    .splash{
       position: fixed;
       inset: 0;
       background: var(--brand);
@@ -44,10 +44,10 @@
       opacity: 1;
       transition: opacity 380ms ease;
     }
-    .splash.fade-out { opacity: 0; pointer-events: none; }
+    .splash.fade-out{ opacity: 0; pointer-events:none; }
     .splash img{
-      width: 120px;
-      height: 120px;
+      width: 132px;
+      height: 132px;
       object-fit: contain;
       filter: drop-shadow(0 12px 24px rgba(0,0,0,.18));
     }
@@ -68,26 +68,31 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
+      gap: 12px;
     }
     .brand{
       display:flex;
       align-items:center;
       gap:10px;
-      min-height: 28px; /* 헤더 높이 최소화 */
+      min-height: 28px;
     }
+
+    /* 헤더 로고(logo3) 안 보이는 케이스 방지: 사이즈/표시 강제 */
     .brand img{
-      width: 22px;
-      height: 22px;
-      object-fit: contain;
+      width: 26px !important;
+      height: 26px !important;
+      display: block !important;
+      object-fit: contain !important;
     }
+
     .brand .name{
       font-weight: 800;
       letter-spacing: -0.02em;
       font-size: 15px;
       line-height: 1;
+      white-space: nowrap;
     }
 
-    /* ===== Layout ===== */
     main{
       max-width: 920px;
       margin: 0 auto;
@@ -134,7 +139,7 @@
       line-height: 1.4;
     }
 
-    /* ===== Card ===== */
+    /* ===== Panels ===== */
     .panel{
       background: var(--card);
       border: 1px solid var(--line);
@@ -217,6 +222,12 @@
       color: var(--muted);
       font-size: 12px;
     }
+    .hr{
+      height: 1px;
+      background: var(--line);
+      margin: 10px 0;
+    }
+
     .cards{
       display:grid;
       grid-template-columns: 1fr;
@@ -246,7 +257,7 @@
       right: 10px;
       bottom: 10px;
       width: 86px;
-      opacity: .08; /* logo3 워터마크 */
+      opacity: .08;
       pointer-events: none;
       user-select: none;
     }
@@ -285,7 +296,7 @@
       color: #344054;
       font-size: 13px;
       line-height: 1.45;
-      padding-right: 70px; /* 워터마크 겹침 방지 */
+      padding-right: 70px;
     }
 
     .footnote{
@@ -294,17 +305,11 @@
       font-size: 12px;
       line-height: 1.5;
     }
-
-    .hr{
-      height: 1px;
-      background: var(--line);
-      margin: 10px 0;
-    }
   </style>
 </head>
 
 <body>
-  <!-- Splash (logo1 only) -->
+  <!-- Splash: 최초 진입 로고는 logo1 고정 -->
   <div class="splash" id="splash" aria-hidden="true">
     <img src="logo1.png" alt="줍줍 스플래시 로고" />
   </div>
@@ -312,17 +317,17 @@
   <header>
     <div class="header-inner">
       <div class="brand" aria-label="줍줍 헤더">
-        <!-- Header uses logo3 only -->
+        <!-- 헤더 로고는 logo3만 사용 -->
         <img src="logo3.png" alt="줍줍 로고" />
         <div class="name">줍줍</div>
       </div>
-      <div style="font-size:12px;color:var(--muted);font-weight:700;">나만의 결제 비서</div>
+      <div style="font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap;">나만의 결제 비서</div>
     </div>
   </header>
 
   <main>
     <div class="stack">
-      <!-- Store pill (only when store param exists) -->
+      <!-- store 파라미터 있을 때만 표시 -->
       <div id="storeWrap" style="display:none;">
         <div class="pill" title="매장명">
           <span class="dot" aria-hidden="true"></span>
@@ -331,12 +336,11 @@
         </div>
       </div>
 
-      <!-- QR notice -->
+      <!-- category 파라미터가 있을 때 안내 -->
       <div id="qrNotice" class="notice" style="display:none;">
         QR로 업종을 자동 선택했습니다. 필요하면 아래에서 직접 변경하실 수 있습니다.
       </div>
 
-      <!-- Input panel -->
       <section class="panel" aria-label="결제 정보 입력">
         <h2>결제 정보</h2>
         <div class="form-grid">
@@ -365,11 +369,10 @@
         </div>
 
         <div class="footnote">
-          현재는 예창패 제출용 MVP로 더미 카드(신한/국민/현대)로 동작합니다. 실제 혜택 데이터는 다음 단계에서 구조화합니다.
+          현재는 예비창업패키지 제출용 MVP로 더미 카드(신한/국민/현대)로 동작합니다. 실제 혜택 데이터는 다음 단계에서 구조화합니다.
         </div>
       </section>
 
-      <!-- Results -->
       <section class="panel" aria-label="추천 결과">
         <div class="results-head">
           <h2 style="margin:0;">추천 결과</h2>
@@ -383,12 +386,11 @@
 
   <script>
     /*********************
-     * Splash
-     * - 0.8~1초 후 페이드아웃
+     * Splash: 0.8~1초 후 페이드아웃
      *********************/
     (function splash(){
       const el = document.getElementById('splash');
-      const DURATION_MS = 900; // 0.9s
+      const DURATION_MS = 900;
       window.setTimeout(() => {
         el.classList.add('fade-out');
         window.setTimeout(() => { el.style.display = 'none'; }, 420);
@@ -396,8 +398,13 @@
     })();
 
     /*********************
-     * Utils
+     * URL Params
+     * category=카페|음식점|편의점 → 업종 자동 선택
+     * from=qr → (표시만 필요하면 확장)
+     * store=스타벅스 → 매장명 표시
      *********************/
+    const params = new URLSearchParams(window.location.search);
+
     function safeDecode(value){
       try { return decodeURIComponent(value || ''); } catch(e){ return value || ''; }
     }
@@ -406,148 +413,119 @@
       const s = (v || '').trim();
       const allowed = ["카페","음식점","편의점","대중교통","온라인","기타"];
       if (allowed.includes(s)) return s;
-      // 흔한 변형 대응
-      const map = {
-        "카페/디저트":"카페",
-        "식당":"음식점",
-        "레스토랑":"음식점",
-        "편의":"편의점",
-        "마트":"기타",
-        "쇼핑":"기타"
-      };
+      const map = { "카페/디저트":"카페", "식당":"음식점", "레스토랑":"음식점" };
       return map[s] || "";
     }
 
     function scoreToBadge(score){
-      // score: 0~100
-      if (score >= 75) return { cls: "ok",  label: "강력 추천", colorVar: "--ok" };
-      if (score >= 55) return { cls: "warn", label: "추천",     colorVar: "--warn" };
-      return { cls: "bad", label: "비추천",   colorVar: "--bad" };
-    }
-
-    /*********************
-     * URL Params (QR)
-     * - category=카페|음식점|편의점 : 업종 자동 선택
-     * - from=qr : QR 진입 여부 판단
-     * - store=스타벅스 : 매장명 표시 (pill)
-     *********************/
-    const params = new URLSearchParams(window.location.search);
-
-    const pFrom = (params.get('from') || '').trim().toLowerCase();
-    const pStore = safeDecode(params.get('store') || '').trim();
-    const pCategoryRaw = safeDecode(params.get('category') || '').trim();
-    const pCategory = normalizeCategory(pCategoryRaw);
-
-    const storeWrap = document.getElementById('storeWrap');
-    const storeName = document.getElementById('storeName');
-    const qrNotice = document.getElementById('qrNotice');
-    const categorySelect = document.getElementById('categorySelect');
-    const amountInput = document.getElementById('amountInput');
-    const resultsEl = document.getElementById('results');
-    const resultSub = document.getElementById('resultSub');
-
-    // Store pill
-    if (pStore){
-      storeName.textContent = pStore;
-      storeWrap.style.display = 'block';
-    }
-
-    // Category auto-select logic
-    const cameFromQR = (pFrom === 'qr');
-    const hasCategoryParam = !!pCategory;
-
-    if (hasCategoryParam){
-      categorySelect.value = pCategory;
-    }
-
-    // 안내 박스 노출: category 파라미터로 자동선택된 경우(요구사항)
-    if (hasCategoryParam){
-      qrNotice.style.display = 'block';
-    }
-
-    /*********************
-     * Dummy Card Data
-     * - 전월실적 충족 여부, 업종 혜택, 카드사 가중치
-     *********************/
-    const dummyCards = [
-      {
-        id: "shinhan_1",
-        issuer: "신한",
-        name: "신한 딥드림(더미)",
-        monthlyRequirement: 300000,
-        monthlySpent: 420000, // 충족
-        benefits: {
-          "카페": { type: "rate", value: 0.10, cap: 5000, note: "카페 10% (월 5천원 한도)" },
-          "음식점": { type: "rate", value: 0.05, cap: 7000, note: "음식점 5% (월 7천원 한도)" },
-          "편의점": { type: "rate", value: 0.02, cap: 3000, note: "편의점 2% (월 3천원 한도)" }
-        }
-      },
-      {
-        id: "kb_1",
-        issuer: "국민",
-        name: "KB 해피포인트(더미)",
-        monthlyRequirement: 400000,
-        monthlySpent: 260000, // 미충족
-        benefits: {
-          "카페": { type: "rate", value: 0.07, cap: 6000, note: "카페 7% (월 6천원 한도)" },
-          "편의점": { type: "rate", value: 0.08, cap: 4000, note: "편의점 8% (월 4천원 한도)" }
-        }
-      },
-      {
-        id: "hyundai_1",
-        issuer: "현대",
-        name: "현대 제로(더미)",
-        monthlyRequirement: 0,
-        monthlySpent: 0,
-        benefits: {
-          "기타": { type: "rate", value: 0.01, cap: 999999, note: "기본 1% (사실상 무제한 가정)" },
-          "온라인": { type: "rate", value: 0.02, cap: 8000, note: "온라인 2% (월 8천원 한도)" }
-        }
-      }
-    ];
-
-    // 예: 가맹점 카드사 일치 가중치(더미)
-    // 실제로는 store -> acquirer/brand 등을 매핑해야 하나, MVP에서는 간단히 store 문자열로 추정.
-    function inferIssuerAffinity(store){
-      const s = (store || "").toLowerCase();
-      // 더미 규칙: 스타벅스면 신한 친화, GS25면 국민 친화 등
-      if (s.includes("스타벅스") || s.includes("starbucks")) return "신한";
-      if (s.includes("gs") || s.includes("gs25")) return "국민";
-      if (s.includes("cu")) return "현대";
-      return ""; // 모름
-    }
-
-    function computeScore(card, category, store){
-      let score = 0;
-
-      // 1) 업종 혜택 일치
-      const benefit = card.benefits[category] || null;
-      if (benefit) score += 50;
-      else if (card.benefits["기타"]) score += 25;
-
-      // 2) 전월 실적 충족
-      const req = card.monthlyRequirement || 0;
-      const met = (req === 0) ? true : (card.monthlySpent >= req);
-      score += met ? 25 : -10;
-
-      // 3) 카드사 일치 가중치(더미)
-      const affinity = inferIssuerAffinity(store);
-      if (affinity && affinity === card.issuer) score += 15;
-
-      // 4) 소폭 보정(기타 fallback)
-      if (!benefit && card.benefits["기타"]) score += 5;
-
-      // clamp
-      if (score < 0) score = 0;
-      if (score > 100) score = 100;
-
-      return { score, met, benefit, affinity };
+      if (score >= 75) return { cls:"ok", label:"강력 추천" };
+      if (score >= 55) return { cls:"warn", label:"추천" };
+      return { cls:"bad", label:"비추천" };
     }
 
     function formatCurrency(n){
       const v = Number(String(n).replace(/[^0-9]/g,''));
       if (!Number.isFinite(v) || v <= 0) return "";
       return v.toLocaleString('ko-KR') + "원";
+    }
+
+    const pStore = safeDecode(params.get('store') || '').trim();
+    const pCategory = normalizeCategory(safeDecode(params.get('category') || '').trim());
+
+    const storeWrap = document.getElementById('storeWrap');
+    const storeName = document.getElementById('storeName');
+    const qrNotice  = document.getElementById('qrNotice');
+    const categorySelect = document.getElementById('categorySelect');
+    const amountInput = document.getElementById('amountInput');
+    const resultsEl = document.getElementById('results');
+    const resultSub = document.getElementById('resultSub');
+
+    if (pStore){
+      storeName.textContent = pStore;
+      storeWrap.style.display = 'block';
+    }
+
+    if (pCategory){
+      categorySelect.value = pCategory;
+      qrNotice.style.display = 'block'; // category 파라미터가 있을 때만
+    }
+
+    /*********************
+     * 더미 카드 데이터 (신한/국민/현대)
+     *********************/
+    const dummyCards = [
+      {
+        cardId: "shinhan_deepdream",
+        issuer: "신한",
+        name: "신한 딥드림(더미)",
+        requirements: { monthlySpendMin: 300000 },
+        user: { monthlySpent: 420000 },
+        rules: [
+          { category:["카페"], note:"카페 10% (월 5천원)" },
+          { category:["음식점"], note:"음식점 5% (월 7천원)" },
+          { category:["편의점"], note:"편의점 2% (월 3천원)" }
+        ],
+        fallback: { note:"기본 혜택 없음(더미)" }
+      },
+      {
+        cardId: "kb_happypoint",
+        issuer: "국민",
+        name: "KB 해피포인트(더미)",
+        requirements: { monthlySpendMin: 400000 },
+        user: { monthlySpent: 260000 }, // 미충족
+        rules: [
+          { category:["카페"], note:"카페 7% (월 6천원)" },
+          { category:["편의점"], note:"편의점 8% (월 4천원)" }
+        ],
+        fallback: { note:"기본 혜택 없음(더미)" }
+      },
+      {
+        cardId: "hyundai_zero",
+        issuer: "현대",
+        name: "현대 제로(더미)",
+        requirements: { monthlySpendMin: 0 },
+        user: { monthlySpent: 0 },
+        rules: [
+          { category:["온라인"], note:"온라인 2% (월 8천원)" },
+          { category:["기타"], note:"기본 1% (가정)" }
+        ],
+        fallback: { note:"기본 1% (가정)" }
+      }
+    ];
+
+    function inferIssuerAffinity(store){
+      const s = (store || "").toLowerCase();
+      if (s.includes("스타벅스") || s.includes("starbucks")) return "신한";
+      if (s.includes("gs") || s.includes("gs25")) return "국민";
+      if (s.includes("cu")) return "현대";
+      return "";
+    }
+
+    function findRule(card, category){
+      return card.rules.find(r => (r.category || []).includes(category)) || null;
+    }
+
+    function computeScore(card, category, store){
+      let score = 0;
+
+      // 1) 업종 혜택 일치
+      const rule = findRule(card, category);
+      if (rule) score += 50;
+      else score += 10;
+
+      // 2) 전월 실적 충족 여부
+      const req = Number(card.requirements?.monthlySpendMin || 0);
+      const spent = Number(card.user?.monthlySpent || 0);
+      const met = (req === 0) ? true : (spent >= req);
+      score += met ? 25 : -10;
+
+      // 3) 카드사 일치 가중치(더미)
+      const affinity = inferIssuerAffinity(store);
+      if (affinity && affinity === card.issuer) score += 15;
+
+      // clamp
+      score = Math.max(0, Math.min(100, score));
+      return { score, met, rule, affinity };
     }
 
     function renderResults(category){
@@ -560,33 +538,24 @@
 
       const store = pStore || "";
       const ranked = dummyCards
-        .map(c => {
-          const r = computeScore(c, category, store);
-          return { card: c, ...r };
-        })
+        .map(card => ({ card, ...computeScore(card, category, store) }))
         .sort((a,b) => b.score - a.score);
 
-      const top = ranked[0];
-
       const amountText = formatCurrency(amountInput.value);
-      const ctx = [];
-      ctx.push("업종: " + category);
+      const ctx = ["업종: " + category];
       if (pStore) ctx.push("매장: " + pStore);
       if (amountText) ctx.push("금액: " + amountText);
       resultSub.textContent = ctx.join(" · ");
 
       ranked.forEach((item, idx) => {
-        const { card, score, met, benefit, affinity } = item;
+        const { card, score, met, rule, affinity } = item;
         const badge = scoreToBadge(score);
 
-        const benefitText =
-          benefit?.note ||
-          card.benefits["기타"]?.note ||
-          "해당 업종 혜택 정보 없음(더미)";
-
-        const perfText = (card.monthlyRequirement === 0)
+        const benefitText = rule?.note || card.fallback?.note || "혜택 정보 없음(더미)";
+        const req = Number(card.requirements?.monthlySpendMin || 0);
+        const perfText = (req === 0)
           ? "전월실적 조건 없음"
-          : ("전월실적 " + card.monthlyRequirement.toLocaleString('ko-KR') + "원 " + (met ? "충족" : "미충족"));
+          : ("전월실적 " + req.toLocaleString('ko-KR') + "원 " + (met ? "충족" : "미충족"));
 
         const affinityText = affinity
           ? ("가맹점 추정 카드사: " + affinity + (affinity === card.issuer ? " (일치)" : " (불일치)"))
@@ -612,29 +581,26 @@
         `;
         resultsEl.appendChild(el);
       });
-
-      // 행동 유도(간단 MVP): 상단 1순위 카드 강조는 이미 top 스타일로 처리
     }
 
     document.getElementById("btnRecommend").addEventListener("click", () => {
-      const category = categorySelect.value;
-      renderResults(category);
+      renderResults(categorySelect.value);
     });
 
     document.getElementById("btnReset").addEventListener("click", () => {
-      // 업종: 파라미터가 있으면 그 값으로, 없으면 빈값
       categorySelect.value = pCategory || "";
       amountInput.value = "";
       renderResults(categorySelect.value);
     });
 
-    // 초기 렌더: category 파라미터가 있으면 자동으로 추천까지 실행(UX 안정화)
+    // QR(category 존재)면 자동 렌더 (결제 직전 UX 고정)
     if (pCategory){
-      renderResults(pCategory);
+      renderResults(categorySelect.value);
     }
   </script>
 </body>
 </html>
+
 
 
 
