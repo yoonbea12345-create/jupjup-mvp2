@@ -6,128 +6,195 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
+    :root{
+      --bg1:#ffcc00;
+      --bg2:#ffe680;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --shadow: 0 8px 18px rgba(0,0,0,0.12);
+      --radius: 18px;
+      --accent:#ff9900;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #f6f7f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
       margin: 0;
       padding: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .container {
+      width: 100%;
       max-width: 420px;
-      margin: auto;
-      padding: 20px;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    .panel{
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(6px);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
     }
 
     h1 {
+      margin: 0 0 14px;
+      font-size: 22px;
+      color: var(--text);
       text-align: center;
-      margin-bottom: 24px;
+    }
+
+    .confirm-box{
+      background: rgba(255,255,255,0.85);
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      margin-bottom: 14px;
+    }
+
+    .confirm-title{
+      font-weight: 800;
+      margin: 0 0 6px;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .confirm-desc{
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    label{
+      display:block;
+      margin-top: 10px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 700;
     }
 
     select, button {
       width: 100%;
       padding: 14px;
-      margin-top: 12px;
-      border-radius: 12px;
-      border: 1px solid #ddd;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,0.08);
       font-size: 16px;
       box-sizing: border-box;
+      background: white;
     }
 
     button {
-      background-color: #ffcc00;
+      margin-top: 16px;
+      background-color: var(--card);
       border: none;
-      font-weight: bold;
-      margin-top: 20px;
+      font-weight: 900;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.10);
+      cursor: pointer;
+      transition: transform 0.08s ease;
     }
 
     button:active {
-      transform: scale(0.97);
+      transform: scale(0.98);
     }
 
     #result {
-      margin-top: 24px;
-      padding: 20px;
-      background: white;
+      margin-top: 18px;
+      padding: 16px;
+      background: rgba(255,255,255,0.9);
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.10);
       line-height: 1.6;
       white-space: pre-line;
     }
 
-    .highlight {
-      color: #ff9900;
-      font-weight: bold;
+    .highlight{
+      color: var(--accent);
+      font-weight: 900;
     }
 
-    .reason {
+    .reason{
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .top-row{
+      display:flex;
+      gap: 10px;
       margin-top: 8px;
-      font-size: 14px;
-      color: #555;
+    }
+
+    .ghost-btn{
+      flex:1;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.85);
+      font-weight: 800;
+      cursor:pointer;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>줍줍 결제 추천</h1>
+    <div class="panel">
+      <h1>줍줍 결제 추천</h1>
 
-    <!-- 카드사 선택 -->
-    <select id="cardCompany">
-      <option value="신한카드">신한카드</option>
-      <option value="국민카드">국민카드</option>
-      <option value="현대카드">현대카드</option>
-    </select>
+      <!-- QR로 들어온 경우: 업종 확인 박스 -->
+      <div class="confirm-box" id="confirmBox" style="display:none;">
+        <p class="confirm-title">업종이 이대로 맞습니까?</p>
+        <p class="confirm-desc">
+          QR에서 자동으로 업종을 선택했습니다. 틀리면 아래에서 업종을 변경해 주시면 됩니다.
+        </p>
+        <div class="top-row">
+          <button class="ghost-btn" type="button" onclick="goBackToQR()">업종 다시 선택</button>
+          <button class="ghost-btn" type="button" onclick="scrollToCategory()">여기서 변경</button>
+        </div>
+      </div>
 
-    <!-- 전월 실적 -->
-    <select id="performance">
-      <option value="30">전월 30만원 이상</option>
-      <option value="50">전월 50만원 이상</option>
-      <option value="100">전월 100만원 이상</option>
-    </select>
+      <label for="cardCompany">카드사</label>
+      <select id="cardCompany">
+        <option value="신한카드">신한카드</option>
+        <option value="국민카드">국민카드</option>
+        <option value="현대카드">현대카드</option>
+      </select>
 
-    <!-- 결제 업종 -->
-    <select id="category">
-      <option value="음식점">음식점</option>
-      <option value="카페">카페</option>
-      <option value="편의점">편의점</option>
-    </select>
+      <label for="performance">전월 실적</label>
+      <select id="performance">
+        <option value="30">전월 30만원 이상</option>
+        <option value="50">전월 50만원 이상</option>
+        <option value="100">전월 100만원 이상</option>
+      </select>
 
-    <button onclick="recommendCard()">추천받기</button>
+      <label for="category">결제 업종</label>
+      <select id="category">
+        <option value="음식점">음식점</option>
+        <option value="카페">카페</option>
+        <option value="편의점">편의점</option>
+      </select>
 
-    <div id="result">결제 전 추천 결과가 표시됩니다.</div>
+      <button type="button" onclick="recommendCard()">추천받기</button>
+
+      <div id="result">결제 전 추천 결과가 표시됩니다.</div>
+    </div>
   </div>
 
   <script>
-    /* ===== 카드 혜택 데이터 (모델링된 구조) ===== */
+    // ===== 카드 혜택 데이터 =====
     const cards = [
-      {
-        name: "신한 딥드림",
-        company: "신한카드",
-        categories: ["카페", "음식점"],
-        benefitType: "할인",
-        discount: 10,
-        minPerformance: 30,
-        monthlyLimit: 10000
-      },
-      {
-        name: "국민 청춘대로",
-        company: "국민카드",
-        categories: ["음식점"],
-        benefitType: "캐시백",
-        discount: 15,
-        minPerformance: 50,
-        monthlyLimit: 15000
-      },
-      {
-        name: "현대 Zero",
-        company: "현대카드",
-        categories: ["카페", "편의점", "음식점"],
-        benefitType: "할인",
-        discount: 5,
-        minPerformance: 0,
-        monthlyLimit: 0
-      }
+      { name: "신한 딥드림", company: "신한카드", categories: ["카페","음식점"], benefitType: "할인", discount: 10, minPerformance: 30, monthlyLimit: 10000 },
+      { name: "국민 청춘대로", company: "국민카드", categories: ["음식점"], benefitType: "캐시백", discount: 15, minPerformance: 50, monthlyLimit: 15000 },
+      { name: "현대 Zero", company: "현대카드", categories: ["카페","편의점","음식점"], benefitType: "할인", discount: 5, minPerformance: 0, monthlyLimit: 0 }
     ];
 
     function recommendCard() {
@@ -136,54 +203,71 @@
       const category = document.getElementById("category").value;
 
       let bestCard = null;
-      let bestScore = 0;
+      let bestScore = -1;
       let reasons = [];
 
-      for (let card of cards) {
+      for (const card of cards) {
         let score = 0;
-        let tempReasons = [];
+        let temp = [];
 
-        if (card.company === company) {
-          score += 20;
-          tempReasons.push("보유 카드사 일치");
-        }
-
-        if (card.categories.includes(category)) {
-          score += 50;
-          tempReasons.push(`${category} 업종 혜택 적용`);
-        }
-
-        if (performance >= card.minPerformance) {
-          score += card.discount;
-          tempReasons.push("전월 실적 조건 충족");
-        } else {
-          tempReasons.push("전월 실적 미충족");
-        }
+        if (card.company === company) { score += 20; temp.push("보유 카드사 일치"); }
+        if (card.categories.includes(category)) { score += 50; temp.push(`${category} 업종 혜택 적용`); }
+        if (performance >= card.minPerformance) { score += card.discount; temp.push("전월 실적 조건 충족"); }
+        else { temp.push("전월 실적 미충족(혜택 제한 가능)"); }
 
         if (score > bestScore) {
           bestScore = score;
           bestCard = card;
-          reasons = tempReasons;
+          reasons = temp;
         }
       }
 
-      if (bestCard) {
-        document.getElementById("result").innerHTML =
-          `<span class="highlight">추천 카드: ${bestCard.name}</span><br>
-          예상 혜택: ${bestCard.discount}% ${bestCard.benefitType}<br>
-          월 혜택 한도: ${bestCard.monthlyLimit ? bestCard.monthlyLimit.toLocaleString() + "원" : "제한 없음"}
-          <div class="reason">✔ ${reasons.join("<br>✔ ")}</div>`;
-      } else {
+      if (!bestCard) {
         document.getElementById("result").innerText = "추천할 카드가 없습니다.";
+        return;
+      }
+
+      const limitText = bestCard.monthlyLimit ? `${bestCard.monthlyLimit.toLocaleString()}원` : "제한 없음";
+
+      document.getElementById("result").innerHTML =
+        `<div><span class="highlight">추천 카드: ${bestCard.name}</span></div>
+         <div>예상 혜택: ${bestCard.discount}% ${bestCard.benefitType}</div>
+         <div>월 혜택 한도: ${limitText}</div>
+         <div class="reason">✔ ${reasons.join("<br>✔ ")}</div>`;
+    }
+
+    // ===== QR에서 넘어온 업종 자동 선택 + 확인 멘트 노출 =====
+    const params = new URLSearchParams(window.location.search);
+    const autoCategory = params.get("category");
+    const from = params.get("from");
+
+    if (autoCategory) {
+      const decoded = decodeURIComponent(autoCategory);
+      const categorySelect = document.getElementById("category");
+
+      for (const opt of categorySelect.options) {
+        if (opt.value === decoded || opt.text === decoded) {
+          categorySelect.value = opt.value;
+          break;
+        }
       }
     }
 
-    /* ===== QR 코드용 자동 업종 인식 ===== */
-    const params = new URLSearchParams(window.location.search);
-    const autoCategory = params.get("category");
-    if (autoCategory) {
-      document.getElementById("category").value = autoCategory;
+    // from=qr이면 확인 박스 보여주기
+    if (from === "qr") {
+      document.getElementById("confirmBox").style.display = "block";
+    }
+
+    function goBackToQR() {
+      location.href = "qr.html";
+    }
+
+    function scrollToCategory() {
+      document.getElementById("category").scrollIntoView({ behavior: "smooth", block: "center" });
+      document.getElementById("category").focus();
     }
   </script>
 </body>
 </html>
+
+
