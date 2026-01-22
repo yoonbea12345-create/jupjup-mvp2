@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>줍줍 | 업종별 QR 링크</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>줍줍: 나만의 결제 비서 MVP</title>
+  <title>줍줍 - 결제 비서 MVP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- (1) 앱 아이콘용 -->
-  <link rel="icon" type="image/png" href="logo1.png" />
-  <link rel="apple-touch-icon" href="logo1.png" />
+  <!-- 1) 앱 아이콘(파비콘/홈화면 아이콘) -->
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
 
   <style>
     :root{
@@ -18,24 +19,26 @@
       --muted:#6b7280;
       --shadow: 0 8px 18px rgba(0,0,0,0.12);
       --radius: 18px;
+      --accent:#ff9900;
       --line: rgba(0,0,0,0.08);
     }
 
-    body{
+    body {
       font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
       background: linear-gradient(135deg, var(--bg1), var(--bg2));
       margin: 0;
+      padding: 0;
       min-height: 100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .container{
-      width:100%;
-      max-width:420px;
-      padding:24px;
-      box-sizing:border-box;
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 24px;
+      box-sizing: border-box;
     }
 
     .panel{
@@ -44,9 +47,14 @@
       border-radius: var(--radius);
       padding: 22px;
       box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
     }
 
-    /* 헤더 (logo3) */
+    h1 {
+      margin: 0 0 14px;
+      font-size: 22px;
+    /* 3) 웹 헤더 */
     .app-header{
       margin-bottom: 14px;
     }
@@ -56,15 +64,18 @@
       gap: 10px;
     }
     .header-logo{
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.10);
+      background: white;
+      object-fit: cover;
     }
     .app-name{
       font-size: 20px;
       font-weight: 900;
       color: var(--text);
+      text-align: center;
       letter-spacing: -0.2px;
     }
     .subtitle{
@@ -74,43 +85,112 @@
       line-height: 1.4;
     }
 
-    p{
-      margin: 10px 0 0;
+    .confirm-box{
+      background: rgba(255,255,255,0.85);
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      margin-bottom: 14px;
+      margin: 12px 0 8px;
+    }
+
+    .confirm-title{
+      font-weight: 900;
+      margin: 0 0 6px;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .confirm-desc{
+      margin: 0;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
-    a.btn{
+    .top-row{
+      display:flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    label{
       display:block;
-      text-decoration:none;
-      background: var(--card);
+      margin-top: 12px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 16px;
       border: 1px solid var(--line);
-      border-radius:16px;
-      padding:14px;
-      font-weight:900;
-      color:var(--text);
-      margin-top:12px;
+      font-size: 16px;
+      box-sizing: border-box;
+      background: white;
+    }
+
+    button {
+      margin-top: 16px;
+      background-color: var(--card);
+      border: none;
+      font-weight: 900;
       box-shadow: 0 6px 12px rgba(0,0,0,0.10);
-      text-align:center;
+      cursor: pointer;
       transition: transform 0.08s ease;
     }
-    a.btn:active{ transform: scale(0.98); }
 
-    code{
-      display:block;
-      background: rgba(255,255,255,0.85);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:10px;
-      font-size:12px;
-      overflow:auto;
-      margin-top:12px;
-      color: #111827;
-      white-space: pre-wrap;
+    button:active {
+      transform: scale(0.98);
+    }
+    button:active { transform: scale(0.98); }
+
+    .ghost-btn{
+      flex:1;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.88);
+      font-weight: 900;
+      cursor:pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      margin-top: 0;
     }
 
-    /* 스플래시 (logo2) */
+    #result {
+      margin-top: 18px;
+      padding: 16px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.10);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .highlight{
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    .reason{
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* 업종 변경을 눌렀을 때 잠깐 강조 */
+    /* 업종 변경 클릭 시 강조 */
+    .pulse {
+      outline: 3px solid rgba(255,153,0,0.35);
+      box-shadow: 0 0 0 6px rgba(255,153,0,0.18);
+      transition: box-shadow 0.2s ease;
+    }
+
+    /* 2) 스플래시(첫 진입 오버레이) */
     .splash{
       position: fixed;
       inset: 0;
@@ -125,18 +205,19 @@
       padding: 24px;
     }
     .splash-logo{
-      width: 220px;
-      max-width: 75vw;
-      height: auto;
-      display: block;
-      margin: 0 auto 14px;
-      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.18));
+      width: 140px;
+      height: 140px;
+      border-radius: 28px;
+      background: white;
+      object-fit: cover;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+      margin-bottom: 18px;
     }
     .splash-title{
       margin: 0;
       font-size: 28px;
       font-weight: 900;
-      color: #1f2937;
+      color: var(--text);
       letter-spacing: -0.3px;
     }
     .splash-tagline{
@@ -155,10 +236,10 @@
 </head>
 
 <body>
-  <!-- 스플래시 -->
+  <!-- 스플래시 오버레이 -->
   <div class="splash" id="splash">
     <div class="splash-inner">
-      <img src="logo2.png" alt="줍줍 스플래시" class="splash-logo" />
+      <img src="logo.png" alt="줍줍 로고" class="splash-logo">
       <h1 class="splash-title">줍줍</h1>
       <p class="splash-tagline">나만의 결제 비서</p>
     </div>
@@ -166,29 +247,60 @@
 
   <div class="container">
     <div class="panel">
+      <h1>줍줍: 나만의 결제 비서</h1>
+      <!-- 웹 헤더 -->
       <header class="app-header">
         <div class="logo-wrap">
-          <img src="logo3.png" alt="줍줍 로고" class="header-logo" />
+          <img src="logo.png" alt="줍줍 로고" class="header-logo">
           <div class="app-name">줍줍</div>
         </div>
-        <div class="subtitle">업종별 QR(링크) 관리/테스트 페이지</div>
+        <div class="subtitle">결제 직전, 가장 유리한 결제수단을 추천합니다.</div>
       </header>
 
-      <p>매장에 붙일 QR은 아래 업종별 링크를 QR로 만들면 됩니다.</p>
+      <!-- QR로 들어온 경우: 업종 확인 박스 -->
+      <div class="confirm-box" id="confirmBox" style="display:none;">
+        <p class="confirm-title" id="confirmTitle">선택된 업종이 맞나요?</p>
+        <p class="confirm-desc">
+          QR코드를 통해 업종을 자동 선택해 드렸습니다.<br>
+          틀린경우 아래 버튼 또는 결제 업종에서 수정해 주세요.
+          틀렸을 경우 아래 버튼 또는 업종 선택에서 수정해 주세요.
+        </p>
+        <div class="top-row">
+          <button class="ghost-btn" type="button" onclick="scrollToCategory()">업종 변경</button>
+        </div>
+      </div>
 
-      <a class="btn" href="index.html?category=카페&from=qr">☕ 카페 QR 링크</a>
-      <a class="btn" href="index.html?category=음식점&from=qr">🍽 음식점 QR 링크</a>
-      <a class="btn" href="index.html?category=편의점&from=qr">🏪 편의점 QR 링크</a>
+      <label for="cardCompany">카드사</label>
+      <select id="cardCompany">
+        <option value="신한카드">신한카드</option>
+        <option value="국민카드">국민카드</option>
+        <option value="현대카드">현대카드</option>
+      </select>
 
-      <code>
-카페: /index.html?category=카페&from=qr
-음식점: /index.html?category=음식점&from=qr
-편의점: /index.html?category=편의점&from=qr
-      </code>
+      <label for="performance">전월 실적</label>
+      <select id="performance">
+        <option value="30">전월 30만원 이상</option>
+        <option value="50">전월 50만원 이상</option>
+        <option value="100">전월 100만원 이상</option>
+      </select>
+
+      <label for="category">결제 업종</label>
+      <select id="category">
+        <option value="음식점">음식점</option>
+        <option value="카페">카페</option>
+        <option value="편의점">편의점</option>
+      </select>
+
+      <button type="button" onclick="recommendCard()">추천받기</button>
+
+      <div id="result">결제 전 추천 결과가 표시됩니다.</div>
     </div>
   </div>
 
   <script>
+    // ===== 카드 혜택 데이터(샘플) =====
+    // MVP에서는 3~5개 정도로 시작하는 것이 맞습니다.
+    // 스플래시: 900ms 후 자연스럽게 사라지게 처리
     window.addEventListener("load", () => {
       const splash = document.getElementById("splash");
       setTimeout(() => {
@@ -196,8 +308,60 @@
         setTimeout(() => splash.remove(), 380);
       }, 900);
     });
-  </script>
-</body>
-</html>
+
+    // 카드 혜택 데이터(샘플)
+    const cards = [
+      { name: "신한 딥드림", company: "신한카드", categories: ["카페","음식점"], benefitType: "할인", discount: 10, minPerformance: 30, monthlyLimit: 10000 },
+      { name: "국민 청춘대로", company: "국민카드", categories: ["음식점"], benefitType: "캐시백", discount: 15, minPerformance: 50, monthlyLimit: 15000 },
+
+      if (!bestCard) {
+        document.getElementById("result").innerText = "추천할 카드가 없습니다.";
+        return;
+      }
+
+      const limitText = bestCard.monthlyLimit ? `${bestCard.monthlyLimit.toLocaleString()}원` : "제한 없음";
+
+      document.getElementById("result").innerHTML =
+        `<div><span class="highlight">추천 카드: ${bestCard.name}</span></div>
+         <div>예상 혜택: ${bestCard.discount}% ${bestCard.benefitType}</div>
+         <div>월 혜택 한도: ${limitText}</div>
+         <div class="reason">✔ ${reasons.join("<br>✔ ")}</div>`;
+    }
+
+    // ===== 업종 자동 선택(업종별 QR용) =====
+    // QR에는 보통 아래 같은 URL을 넣습니다:
+    // /index.html?category=카페&from=qr
+    // 업종 자동 선택(업종별 QR용)
+    const params = new URLSearchParams(window.location.search);
+    const autoCategory = params.get("category");
+    const from = params.get("from");
+
+    if (autoCategory) {
+      const decoded = decodeURIComponent(autoCategory);
+      const categorySelect = document.getElementById("category");
+
+      // 옵션 value와 정확히 일치하면 바로 선택
+      categorySelect.value = decoded;
+
+      // 확인 박스 제목도 업종에 맞춰서 바꿔줌(선택사항)
+      const title = document.getElementById("confirmTitle");
+      if (title) title.innerText = `선택된 업종이 '${decoded}'(이)가 맞나요?`;
+    }
+
+    // QR에서 들어온 경우에만 안내 박스 표시
+    if (from === "qr") {
+      const box = document.getElementById("confirmBox");
+      if (box) box.style.display = "block";
+    }
+
+    function scrollToCategory() {
+      const el = document.getElementById("category");
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.focus();
+
+      // 잠깐 강조 효과
+      el.classList.add("pulse");
+      setTimeout(() => el.classList.remove("pulse"), 800);
+
 
 
