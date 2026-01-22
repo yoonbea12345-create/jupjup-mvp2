@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>줍줍 | 업종별 QR 링크</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 1) 앱 아이콘(파비콘/홈화면 아이콘) -->
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
 
   <style>
     :root{
@@ -20,14 +24,14 @@
     body{
       font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
       background: linear-gradient(135deg, var(--bg1), var(--bg2));
-      margin:0;
-      min-height:100vh;
+      margin: 0;
+      min-height: 100vh;
       display:flex;
       align-items:center;
       justify-content:center;
     }
 
-    .wrap{
+    .container{
       width:100%;
       max-width:420px;
       padding:24px;
@@ -40,21 +44,44 @@
       border-radius: var(--radius);
       padding: 22px;
       box-shadow: var(--shadow);
+      overflow: hidden;
     }
 
-    h1{
-      margin:0 0 10px;
-      font-size:20px;
-      text-align:center;
-      color:var(--text);
+    /* 3) 웹 헤더 */
+    .app-header{
+      margin-bottom: 14px;
+    }
+    .logo-wrap{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .header-logo{
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.10);
+      background: white;
+      object-fit: cover;
+    }
+    .app-name{
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.2px;
+    }
+    .subtitle{
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.4;
     }
 
     p{
-      margin:0 0 14px;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.5;
-      text-align:center;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     a.btn{
@@ -66,17 +93,12 @@
       padding:14px;
       font-weight:900;
       color:var(--text);
-      margin-top:10px;
+      margin-top:12px;
       box-shadow: 0 6px 12px rgba(0,0,0,0.10);
       text-align:center;
+      transition: transform 0.08s ease;
     }
-
-    .small{
-      margin-top:14px;
-      text-align:center;
-      font-size:12px;
-      color:var(--muted);
-    }
+    a.btn:active{ transform: scale(0.98); }
 
     code{
       display:block;
@@ -86,22 +108,80 @@
       padding:10px;
       font-size:12px;
       overflow:auto;
-      margin-top:10px;
+      margin-top:12px;
+      color: #111827;
+    }
+
+    /* 2) 스플래시(첫 진입 오버레이) */
+    .splash{
+      position: fixed;
+      inset: 0;
+      background: #FFCC00;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .splash-inner{
+      text-align: center;
+      padding: 24px;
+    }
+    .splash-logo{
+      width: 140px;
+      height: 140px;
+      border-radius: 28px;
+      background: white;
+      object-fit: cover;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+      margin-bottom: 18px;
+    }
+    .splash-title{
+      margin: 0;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+    .splash-tagline{
+      margin: 8px 0 0;
+      font-size: 14px;
+      color: rgba(31,41,55,0.78);
+      font-weight: 700;
+    }
+    .splash-fadeout{
+      animation: fadeOut 0.35s ease forwards;
+    }
+    @keyframes fadeOut{
+      to { opacity: 0; visibility: hidden; }
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
+  <!-- 스플래시 오버레이 -->
+  <div class="splash" id="splash">
+    <div class="splash-inner">
+      <img src="logo.png" alt="줍줍 로고" class="splash-logo">
+      <h1 class="splash-title">줍줍</h1>
+      <p class="splash-tagline">나만의 결제 비서</p>
+    </div>
+  </div>
+
+  <div class="container">
     <div class="panel">
-      <h1>업종별 QR 링크(관리/테스트용)</h1>
+      <header class="app-header">
+        <div class="logo-wrap">
+          <img src="logo.png" alt="줍줍 로고" class="header-logo">
+          <div class="app-name">줍줍</div>
+        </div>
+        <div class="subtitle">업종별 QR(링크) 관리/테스트 페이지</div>
+      </header>
+
       <p>실전 운영은 업종별로 다른 URL을 QR로 만들어 매장에 부착하시면 됩니다.</p>
 
       <a class="btn" href="index.html?category=카페&from=qr">☕ 카페 QR 링크</a>
       <a class="btn" href="index.html?category=음식점&from=qr">🍽 음식점 QR 링크</a>
       <a class="btn" href="index.html?category=편의점&from=qr">🏪 편의점 QR 링크</a>
-
-      <div class="small">QR 생성 시 아래 URL을 그대로 넣으시면 됩니다.</div>
 
       <code>
 카페: /index.html?category=카페&from=qr
@@ -110,5 +190,15 @@
       </code>
     </div>
   </div>
+
+  <script>
+    window.addEventListener("load", () => {
+      const splash = document.getElementById("splash");
+      setTimeout(() => {
+        splash.classList.add("splash-fadeout");
+        setTimeout(() => splash.remove(), 380);
+      }, 900);
+    });
+  </script>
 </body>
 </html>
