@@ -1,419 +1,640 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>줍줍 - 결제 비서 MVP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- 앱 아이콘 -->
-  <link rel="icon" type="image/png" href="logo1.png" />
-  <link rel="apple-touch-icon" href="logo1.png" />
+  <title>줍줍(JUPJUP) - 나만의 결제 비서</title>
+  <meta name="description" content="결제 직전, 가장 유리한 카드 추천. 줍줍(JUPJUP) 나만의 결제 비서" />
 
   <style>
     :root{
-      --bg1:#ffcc00;
-      --bg2:#ffe680;
+      --bg:#f6f7fb;
       --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --shadow: 0 8px 18px rgba(0,0,0,0.12);
-      --radius: 18px;
-      --accent:#ff9900;
-      --line: rgba(0,0,0,0.08);
+      --text:#101828;
+      --muted:#667085;
+      --line:#e4e7ec;
+
+      --brand:#ff7a00;        /* 오렌지 */
+      --brand-weak:#fff1e6;
+      --shadow: 0 10px 25px rgba(16,24,40,.08);
+      --radius:16px;
+
+      --ok:#12b76a;
+      --warn:#f79009;
+      --bad:#f04438;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-      background: linear-gradient(135deg, var(--bg1), var(--bg2));
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Helvetica, Arial, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      background:var(--bg);
+      color:var(--text);
     }
 
-    .container {
-      width: 100%;
-      max-width: 420px;
-      padding: 24px;
-      box-sizing: border-box;
-    }
-
-    .panel{
-      background: rgba(255,255,255,0.75);
-      backdrop-filter: blur(6px);
-      border-radius: var(--radius);
-      padding: 22px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    /* 헤더 */
-    .app-header{
-      margin-bottom: 14px;
-    }
-    .logo-wrap{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-    }
-    .header-logo{
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
-    }
-    .app-name{
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--text);
-      letter-spacing: -0.2px;
-    }
-    .subtitle{
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 4px;
-      line-height: 1.4;
-    }
-
-    /* QR 자동 업종 안내 */
-    .confirm-box{
-      background: rgba(255,255,255,0.85);
-      border-radius: 14px;
-      padding: 12px 14px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      margin: 12px 0 10px;
-      display:none;
-    }
-    .confirm-title{
-      font-weight: 900;
-      margin: 0 0 6px;
-      color: var(--text);
-      font-size: 14px;
-    }
-    .confirm-desc{
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-    .top-row{
-      display:flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    label{
-      display:block;
-      margin-top: 12px;
-      margin-bottom: 6px;
-      font-size: 13px;
-      color: var(--text);
-      font-weight: 800;
-    }
-
-    select, button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      font-size: 16px;
-      box-sizing: border-box;
-      background: white;
-    }
-
-    button {
-      margin-top: 16px;
-      background-color: var(--card);
-      border: none;
-      font-weight: 900;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.10);
-      cursor: pointer;
-      transition: transform 0.08s ease;
-    }
-    button:active { transform: scale(0.98); }
-
-    .ghost-btn{
-      flex:1;
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.88);
-      font-weight: 900;
-      cursor:pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-      margin-top: 0;
-    }
-
-    #result {
-      margin-top: 18px;
-      padding: 16px;
-      background: rgba(255,255,255,0.9);
-      border-radius: 16px;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.10);
-      line-height: 1.6;
-      white-space: pre-line;
-    }
-
-    .highlight{
-      color: var(--accent);
-      font-weight: 900;
-    }
-    .reason{
-      margin-top: 10px;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
-    .pulse {
-      outline: 3px solid rgba(255,153,0,0.35);
-      box-shadow: 0 0 0 6px rgba(255,153,0,0.18);
-      transition: box-shadow 0.2s ease;
-    }
-
-    /* 스플래시 */
-    .splash{
+    /* ===== Splash ===== */
+    .splash {
       position: fixed;
       inset: 0;
-      background: #FFCC00;
+      background: var(--brand);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
+      opacity: 1;
+      transition: opacity 380ms ease;
     }
-    .splash-inner{
-      text-align: center;
-      padding: 24px;
-    }
-    .splash-logo{
-      width: 220px;
-      max-width: 75vw;
-      height: auto;
-      display: block;
-      margin: 0 auto 14px;
-      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.18));
-    }
-    .splash-title{
-      margin: 0;
-      font-size: 28px;
-      font-weight: 900;
-      color: #1f2937;
-      letter-spacing: -0.3px;
-    }
-    .splash-tagline{
-      margin: 8px 0 0;
-      font-size: 14px;
-      color: rgba(31,41,55,0.78);
-      font-weight: 700;
-    }
-    .splash-fadeout{
-      animation: fadeOut 0.35s ease forwards;
-    }
-    @keyframes fadeOut{
-      to { opacity: 0; visibility: hidden; }
+    .splash.fade-out { opacity: 0; pointer-events: none; }
+    .splash img{
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,.18));
     }
 
-    /* QR 링크 박스(옵션: qr.html 대체용) */
-    details{
-      margin-top: 16px;
-      background: rgba(255,255,255,0.85);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 12px 14px;
+    /* ===== Header ===== */
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
     }
-    summary{
-      cursor: pointer;
-      font-weight: 900;
+    .header-inner{
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-height: 28px; /* 헤더 높이 최소화 */
+    }
+    .brand img{
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+    .brand .name{
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    /* ===== Layout ===== */
+    main{
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .stack{ display:flex; flex-direction:column; gap:12px; }
+
+    /* ===== Pills / Alerts ===== */
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: 13px;
+      box-shadow: 0 6px 14px rgba(16,24,40,.05);
+      width: fit-content;
+      max-width: 100%;
+    }
+    .pill .dot{
+      width: 8px; height: 8px;
+      background: var(--brand);
+      border-radius: 999px;
+      flex: 0 0 auto;
+    }
+    .pill strong{ white-space: nowrap; }
+    .pill span{
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .notice{
+      border: 1px solid #ffd7b3;
+      background: var(--brand-weak);
+      border-radius: 12px;
+      padding: 12px;
+      color: #7a2e00;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    /* ===== Card ===== */
+    .panel{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .panel h2{
+      margin: 0 0 10px;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+    }
+
+    /* ===== Form ===== */
+    .form-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 720px){
+      .form-grid{ grid-template-columns: 1fr 1fr; }
+    }
+
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    select, input{
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      outline: none;
+      font-size: 14px;
       color: var(--text);
     }
-    .qr-links{
-      margin-top: 10px;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.6;
-      word-break: break-all;
+    select:focus, input:focus{
+      border-color: rgba(255,122,0,.65);
+      box-shadow: 0 0 0 4px rgba(255,122,0,.15);
     }
-    .qr-links b{ color: var(--text); }
+
+    .btn-row{
+      display:flex;
+      gap:10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .btn.primary{
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 10px 18px rgba(255,122,0,.25);
+    }
+    .btn.ghost{
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    /* ===== Results ===== */
+    .results-head{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap: wrap;
+    }
+    .results-head .sub{
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .cards{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    @media (min-width: 720px){
+      .cards{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .rec-card{
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 14px;
+      box-shadow: 0 10px 22px rgba(16,24,40,.06);
+      min-height: 132px;
+    }
+    .rec-card.top{
+      border-color: rgba(255,122,0,.55);
+      box-shadow: 0 14px 28px rgba(255,122,0,.18);
+    }
+    .rec-card .wm{
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      width: 86px;
+      opacity: .08; /* logo3 워터마크 */
+      pointer-events: none;
+      user-select: none;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid var(--line);
+      background: #fff;
+      width: fit-content;
+    }
+    .badge.ok{ border-color: rgba(18,183,106,.35); }
+    .badge.warn{ border-color: rgba(247,144,9,.35); }
+    .badge.bad{ border-color: rgba(240,68,56,.35); }
+
+    .rec-title{
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    .rec-meta{
+      margin-top: 6px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .rec-desc{
+      margin-top: 10px;
+      color: #344054;
+      font-size: 13px;
+      line-height: 1.45;
+      padding-right: 70px; /* 워터마크 겹침 방지 */
+    }
+
+    .footnote{
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .hr{
+      height: 1px;
+      background: var(--line);
+      margin: 10px 0;
+    }
   </style>
 </head>
 
 <body>
-  <!-- 스플래시 -->
-  <div class="splash" id="splash">
-    <div class="splash-inner">
-      <img src="logo2.png" alt="줍줍 스플래시" class="splash-logo" />
-      <h1 class="splash-title">줍줍</h1>
-      <p class="splash-tagline">나만의 결제 비서</p>
-    </div>
+  <!-- Splash (logo1 only) -->
+  <div class="splash" id="splash" aria-hidden="true">
+    <img src="logo1.png" alt="줍줍 스플래시 로고" />
   </div>
 
-  <div class="container">
-    <div class="panel">
-      <header class="app-header">
-        <div class="logo-wrap">
-          <img src="logo3.png" alt="줍줍 로고" class="header-logo" />
-          <div class="app-name">줍줍</div>
-        </div>
-        <div class="subtitle">결제 직전, 가장 유리한 결제수단을 추천합니다.</div>
-      </header>
+  <header>
+    <div class="header-inner">
+      <div class="brand" aria-label="줍줍 헤더">
+        <!-- Header uses logo3 only -->
+        <img src="logo3.png" alt="줍줍 로고" />
+        <div class="name">줍줍</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);font-weight:700;">나만의 결제 비서</div>
+    </div>
+  </header>
 
-      <!-- QR 자동 안내 -->
-      <div class="confirm-box" id="confirmBox">
-        <p class="confirm-title" id="confirmTitle">선택된 업종이 맞나요?</p>
-        <p class="confirm-desc">
-          QR코드를 통해 업종을 자동 선택해 드렸습니다.<br>
-          틀렸다면 아래 버튼 또는 업종 선택에서 수정해 주세요.
-        </p>
-        <div class="top-row">
-          <button class="ghost-btn" type="button" onclick="scrollToCategory()">업종 변경</button>
+  <main>
+    <div class="stack">
+      <!-- Store pill (only when store param exists) -->
+      <div id="storeWrap" style="display:none;">
+        <div class="pill" title="매장명">
+          <span class="dot" aria-hidden="true"></span>
+          <strong id="storeName">-</strong>
+          <span>에서 결제 중</span>
         </div>
       </div>
 
-      <label for="cardCompany">카드사</label>
-      <select id="cardCompany">
-        <option value="신한카드">신한카드</option>
-        <option value="국민카드">국민카드</option>
-        <option value="현대카드">현대카드</option>
-      </select>
+      <!-- QR notice -->
+      <div id="qrNotice" class="notice" style="display:none;">
+        QR로 업종을 자동 선택했습니다. 필요하면 아래에서 직접 변경하실 수 있습니다.
+      </div>
 
-      <label for="performance">전월 실적</label>
-      <select id="performance">
-        <option value="30">전월 30만원 이상</option>
-        <option value="50">전월 50만원 이상</option>
-        <option value="100">전월 100만원 이상</option>
-      </select>
+      <!-- Input panel -->
+      <section class="panel" aria-label="결제 정보 입력">
+        <h2>결제 정보</h2>
+        <div class="form-grid">
+          <div>
+            <label for="categorySelect">업종</label>
+            <select id="categorySelect">
+              <option value="">업종 선택</option>
+              <option value="카페">카페</option>
+              <option value="음식점">음식점</option>
+              <option value="편의점">편의점</option>
+              <option value="대중교통">대중교통</option>
+              <option value="온라인">온라인</option>
+              <option value="기타">기타</option>
+            </select>
+          </div>
 
-      <label for="category">결제 업종</label>
-      <select id="category">
-        <option value="음식점">음식점</option>
-        <option value="카페">카페</option>
-        <option value="편의점">편의점</option>
-      </select>
+          <div>
+            <label for="amountInput">결제 금액 (선택)</label>
+            <input id="amountInput" inputmode="numeric" placeholder="예: 5400" />
+          </div>
+        </div>
 
-      <button type="button" onclick="recommendCard()">추천받기</button>
+        <div class="btn-row">
+          <button class="btn primary" id="btnRecommend">지금 결제 추천 받기</button>
+          <button class="btn ghost" id="btnReset">초기화</button>
+        </div>
 
-      <div id="result">결제 전 추천 결과가 표시됩니다.</div>
+        <div class="footnote">
+          현재는 예창패 제출용 MVP로 더미 카드(신한/국민/현대)로 동작합니다. 실제 혜택 데이터는 다음 단계에서 구조화합니다.
+        </div>
+      </section>
 
-      <!-- qr.html을 없앨 거라, 필요하면 여기서 QR 링크를 확인할 수 있게 옵션 제공 -->
-      <details>
-        <summary>업종별 QR 링크 보기(생성용)</summary>
-        <div class="qr-links" id="qrLinks"></div>
-      </details>
+      <!-- Results -->
+      <section class="panel" aria-label="추천 결과">
+        <div class="results-head">
+          <h2 style="margin:0;">추천 결과</h2>
+          <div class="sub" id="resultSub">업종을 선택한 뒤 추천을 실행해 주십시오.</div>
+        </div>
+        <div class="hr"></div>
+        <div id="results" class="cards"></div>
+      </section>
     </div>
-  </div>
+  </main>
 
   <script>
-    // 스플래시 제거
-    window.addEventListener("load", () => {
-      const splash = document.getElementById("splash");
-      setTimeout(() => {
-        splash.classList.add("splash-fadeout");
-        setTimeout(() => splash.remove(), 380);
-      }, 900);
-    });
+    /*********************
+     * Splash
+     * - 0.8~1초 후 페이드아웃
+     *********************/
+    (function splash(){
+      const el = document.getElementById('splash');
+      const DURATION_MS = 900; // 0.9s
+      window.setTimeout(() => {
+        el.classList.add('fade-out');
+        window.setTimeout(() => { el.style.display = 'none'; }, 420);
+      }, DURATION_MS);
+    })();
 
-    // 카드 혜택 데이터(샘플)
-    const cards = [
-      { name: "신한 딥드림", company: "신한카드", categories: ["카페","음식점"], benefitType: "할인", discount: 10, minPerformance: 30, monthlyLimit: 10000 },
-      { name: "국민 청춘대로", company: "국민카드", categories: ["음식점"], benefitType: "캐시백", discount: 15, minPerformance: 50, monthlyLimit: 15000 },
-      { name: "현대 Zero", company: "현대카드", categories: ["카페","편의점","음식점"], benefitType: "할인", discount: 5, minPerformance: 0, monthlyLimit: 0 }
-    ];
+    /*********************
+     * Utils
+     *********************/
+    function safeDecode(value){
+      try { return decodeURIComponent(value || ''); } catch(e){ return value || ''; }
+    }
 
-    function recommendCard() {
-      const company = document.getElementById("cardCompany").value;
-      const performance = Number(document.getElementById("performance").value);
-      const category = document.getElementById("category").value;
+    function normalizeCategory(v){
+      const s = (v || '').trim();
+      const allowed = ["카페","음식점","편의점","대중교통","온라인","기타"];
+      if (allowed.includes(s)) return s;
+      // 흔한 변형 대응
+      const map = {
+        "카페/디저트":"카페",
+        "식당":"음식점",
+        "레스토랑":"음식점",
+        "편의":"편의점",
+        "마트":"기타",
+        "쇼핑":"기타"
+      };
+      return map[s] || "";
+    }
 
-      let bestCard = null;
-      let bestScore = -1;
-      let reasons = [];
+    function scoreToBadge(score){
+      // score: 0~100
+      if (score >= 75) return { cls: "ok",  label: "강력 추천", colorVar: "--ok" };
+      if (score >= 55) return { cls: "warn", label: "추천",     colorVar: "--warn" };
+      return { cls: "bad", label: "비추천",   colorVar: "--bad" };
+    }
 
-      for (const card of cards) {
-        let score = 0;
-        let temp = [];
+    /*********************
+     * URL Params (QR)
+     * - category=카페|음식점|편의점 : 업종 자동 선택
+     * - from=qr : QR 진입 여부 판단
+     * - store=스타벅스 : 매장명 표시 (pill)
+     *********************/
+    const params = new URLSearchParams(window.location.search);
 
-        if (card.company === company) { score += 20; temp.push("보유 카드사와 일치"); }
-        if (card.categories.includes(category)) { score += 50; temp.push(`${category} 업종 혜택 적용`); }
-        if (performance >= card.minPerformance) { score += card.discount; temp.push("전월 실적 조건 충족"); }
-        else { temp.push("전월 실적 미충족(혜택 제한 가능)"); }
+    const pFrom = (params.get('from') || '').trim().toLowerCase();
+    const pStore = safeDecode(params.get('store') || '').trim();
+    const pCategoryRaw = safeDecode(params.get('category') || '').trim();
+    const pCategory = normalizeCategory(pCategoryRaw);
 
-        if (score > bestScore) {
-          bestScore = score;
-          bestCard = card;
-          reasons = temp;
+    const storeWrap = document.getElementById('storeWrap');
+    const storeName = document.getElementById('storeName');
+    const qrNotice = document.getElementById('qrNotice');
+    const categorySelect = document.getElementById('categorySelect');
+    const amountInput = document.getElementById('amountInput');
+    const resultsEl = document.getElementById('results');
+    const resultSub = document.getElementById('resultSub');
+
+    // Store pill
+    if (pStore){
+      storeName.textContent = pStore;
+      storeWrap.style.display = 'block';
+    }
+
+    // Category auto-select logic
+    const cameFromQR = (pFrom === 'qr');
+    const hasCategoryParam = !!pCategory;
+
+    if (hasCategoryParam){
+      categorySelect.value = pCategory;
+    }
+
+    // 안내 박스 노출: category 파라미터로 자동선택된 경우(요구사항)
+    if (hasCategoryParam){
+      qrNotice.style.display = 'block';
+    }
+
+    /*********************
+     * Dummy Card Data
+     * - 전월실적 충족 여부, 업종 혜택, 카드사 가중치
+     *********************/
+    const dummyCards = [
+      {
+        id: "shinhan_1",
+        issuer: "신한",
+        name: "신한 딥드림(더미)",
+        monthlyRequirement: 300000,
+        monthlySpent: 420000, // 충족
+        benefits: {
+          "카페": { type: "rate", value: 0.10, cap: 5000, note: "카페 10% (월 5천원 한도)" },
+          "음식점": { type: "rate", value: 0.05, cap: 7000, note: "음식점 5% (월 7천원 한도)" },
+          "편의점": { type: "rate", value: 0.02, cap: 3000, note: "편의점 2% (월 3천원 한도)" }
+        }
+      },
+      {
+        id: "kb_1",
+        issuer: "국민",
+        name: "KB 해피포인트(더미)",
+        monthlyRequirement: 400000,
+        monthlySpent: 260000, // 미충족
+        benefits: {
+          "카페": { type: "rate", value: 0.07, cap: 6000, note: "카페 7% (월 6천원 한도)" },
+          "편의점": { type: "rate", value: 0.08, cap: 4000, note: "편의점 8% (월 4천원 한도)" }
+        }
+      },
+      {
+        id: "hyundai_1",
+        issuer: "현대",
+        name: "현대 제로(더미)",
+        monthlyRequirement: 0,
+        monthlySpent: 0,
+        benefits: {
+          "기타": { type: "rate", value: 0.01, cap: 999999, note: "기본 1% (사실상 무제한 가정)" },
+          "온라인": { type: "rate", value: 0.02, cap: 8000, note: "온라인 2% (월 8천원 한도)" }
         }
       }
+    ];
 
-      if (!bestCard) {
-        document.getElementById("result").innerText = "추천할 카드가 없습니다.";
+    // 예: 가맹점 카드사 일치 가중치(더미)
+    // 실제로는 store -> acquirer/brand 등을 매핑해야 하나, MVP에서는 간단히 store 문자열로 추정.
+    function inferIssuerAffinity(store){
+      const s = (store || "").toLowerCase();
+      // 더미 규칙: 스타벅스면 신한 친화, GS25면 국민 친화 등
+      if (s.includes("스타벅스") || s.includes("starbucks")) return "신한";
+      if (s.includes("gs") || s.includes("gs25")) return "국민";
+      if (s.includes("cu")) return "현대";
+      return ""; // 모름
+    }
+
+    function computeScore(card, category, store){
+      let score = 0;
+
+      // 1) 업종 혜택 일치
+      const benefit = card.benefits[category] || null;
+      if (benefit) score += 50;
+      else if (card.benefits["기타"]) score += 25;
+
+      // 2) 전월 실적 충족
+      const req = card.monthlyRequirement || 0;
+      const met = (req === 0) ? true : (card.monthlySpent >= req);
+      score += met ? 25 : -10;
+
+      // 3) 카드사 일치 가중치(더미)
+      const affinity = inferIssuerAffinity(store);
+      if (affinity && affinity === card.issuer) score += 15;
+
+      // 4) 소폭 보정(기타 fallback)
+      if (!benefit && card.benefits["기타"]) score += 5;
+
+      // clamp
+      if (score < 0) score = 0;
+      if (score > 100) score = 100;
+
+      return { score, met, benefit, affinity };
+    }
+
+    function formatCurrency(n){
+      const v = Number(String(n).replace(/[^0-9]/g,''));
+      if (!Number.isFinite(v) || v <= 0) return "";
+      return v.toLocaleString('ko-KR') + "원";
+    }
+
+    function renderResults(category){
+      resultsEl.innerHTML = "";
+
+      if (!category){
+        resultSub.textContent = "업종을 선택한 뒤 추천을 실행해 주십시오.";
         return;
       }
 
-      const limitText = bestCard.monthlyLimit ? `${bestCard.monthlyLimit.toLocaleString()}원` : "제한 없음";
+      const store = pStore || "";
+      const ranked = dummyCards
+        .map(c => {
+          const r = computeScore(c, category, store);
+          return { card: c, ...r };
+        })
+        .sort((a,b) => b.score - a.score);
 
-      document.getElementById("result").innerHTML =
-        `<div><span class="highlight">추천 카드: ${bestCard.name}</span></div>
-         <div>예상 혜택: ${bestCard.discount}% ${bestCard.benefitType}</div>
-         <div>월 혜택 한도: ${limitText}</div>
-         <div class="reason">✔ ${reasons.join("<br>✔ ")}</div>`;
+      const top = ranked[0];
+
+      const amountText = formatCurrency(amountInput.value);
+      const ctx = [];
+      ctx.push("업종: " + category);
+      if (pStore) ctx.push("매장: " + pStore);
+      if (amountText) ctx.push("금액: " + amountText);
+      resultSub.textContent = ctx.join(" · ");
+
+      ranked.forEach((item, idx) => {
+        const { card, score, met, benefit, affinity } = item;
+        const badge = scoreToBadge(score);
+
+        const benefitText =
+          benefit?.note ||
+          card.benefits["기타"]?.note ||
+          "해당 업종 혜택 정보 없음(더미)";
+
+        const perfText = (card.monthlyRequirement === 0)
+          ? "전월실적 조건 없음"
+          : ("전월실적 " + card.monthlyRequirement.toLocaleString('ko-KR') + "원 " + (met ? "충족" : "미충족"));
+
+        const affinityText = affinity
+          ? ("가맹점 추정 카드사: " + affinity + (affinity === card.issuer ? " (일치)" : " (불일치)"))
+          : "가맹점 카드사 추정 불가";
+
+        const el = document.createElement("div");
+        el.className = "rec-card" + (idx === 0 ? " top" : "");
+        el.innerHTML = `
+          <div class="badge ${badge.cls}">
+            ${idx === 0 ? "1순위" : (idx+1) + "순위"} · ${badge.label} (${score}점)
+          </div>
+          <div class="rec-title">${card.name}</div>
+          <div class="rec-meta">
+            <span>카드사: ${card.issuer}</span>
+            <span>·</span>
+            <span>${perfText}</span>
+          </div>
+          <div class="rec-desc">
+            <strong>혜택:</strong> ${benefitText}<br/>
+            <span style="color:var(--muted);">${affinityText}</span>
+          </div>
+          <img class="wm" src="logo3.png" alt="" aria-hidden="true" />
+        `;
+        resultsEl.appendChild(el);
+      });
+
+      // 행동 유도(간단 MVP): 상단 1순위 카드 강조는 이미 top 스타일로 처리
     }
 
-    // QR 자동 업종 선택 + 안내 박스 노출
-    const params = new URLSearchParams(window.location.search);
-    const autoCategory = params.get("category");
-    const from = params.get("from"); // from=qr이면 QR 진입으로 간주
+    document.getElementById("btnRecommend").addEventListener("click", () => {
+      const category = categorySelect.value;
+      renderResults(category);
+    });
 
-    const confirmBox = document.getElementById("confirmBox");
-    const confirmTitle = document.getElementById("confirmTitle");
+    document.getElementById("btnReset").addEventListener("click", () => {
+      // 업종: 파라미터가 있으면 그 값으로, 없으면 빈값
+      categorySelect.value = pCategory || "";
+      amountInput.value = "";
+      renderResults(categorySelect.value);
+    });
 
-    // 기본: QR이 아니라면 안내 박스 숨김
-    confirmBox.style.display = "none";
-
-    if (autoCategory) {
-      const decoded = decodeURIComponent(autoCategory);
-      const categorySelect = document.getElementById("category");
-
-      // 값이 있는 경우에만 세팅
-      for (const opt of categorySelect.options) {
-        if (opt.value === decoded || opt.text === decoded) {
-          categorySelect.value = opt.value;
-          break;
-        }
-      }
-      if (confirmTitle) confirmTitle.innerText = `선택된 업종이 '${decoded}'(이)가 맞나요?`;
+    // 초기 렌더: category 파라미터가 있으면 자동으로 추천까지 실행(UX 안정화)
+    if (pCategory){
+      renderResults(pCategory);
     }
-
-    // QR로 들어왔거나 category 파라미터가 있으면 안내 박스 표시
-    if (from === "qr" || autoCategory) {
-      confirmBox.style.display = "block";
-    }
-
-    function scrollToCategory() {
-      const el = document.getElementById("category");
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-      el.focus();
-      el.classList.add("pulse");
-      setTimeout(() => el.classList.remove("pulse"), 800);
-    }
-
-    // (옵션) index 하나로 QR 링크까지 보여주기
-    function buildQRLinks() {
-      const base = location.origin + location.pathname; // .../index.html
-      const cafe = `${base}?category=${encodeURIComponent("카페")}&from=qr`;
-      const food = `${base}?category=${encodeURIComponent("음식점")}&from=qr`;
-      const mart = `${base}?category=${encodeURIComponent("편의점")}&from=qr`;
-      document.getElementById("qrLinks").innerHTML = `
-        <div><b>카페</b>: ${cafe}</div>
-        <div><b>음식점</b>: ${food}</div>
-        <div><b>편의점</b>: ${mart}</div>
-      `;
-    }
-    buildQRLinks();
   </script>
 </body>
 </html>
-
 
 
 
