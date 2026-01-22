@@ -1,655 +1,178 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>줍줍(JUPJUP) - 나만의 결제 비서</title>
-  <meta name="description" content="결제 직전, 가장 유리한 결제수단을 추천하는 줍줍(JUPJUP)" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>줍줍(JUPJUP) - 스마트 결제 비서</title>
+    <link href="https://cdn.jsdelivr.net/gh/sun-asterisk/fonts/SpoqaHanSansNeo/SpoqaHanSansNeo.css" rel="stylesheet">
+    <style>
+        :root {
+            --main-orange: #FF6B00;
+            --trust-navy: #1A2B4C;
+            --money-gold: #FFD700;
+            --bg-gray: #F8F9FA;
+        }
 
-  <style>
-    :root{
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --text:#101828;
-      --muted:#667085;
-      --line:#e4e7ec;
+        body {
+            font-family: 'Spoqa Han Sans Neo', sans-serif;
+            background-color: var(--bg-gray);
+            color: var(--trust-navy);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-      --brand:#ff7a00;
-      --brand-weak:#fff1e6;
-      --shadow: 0 10px 25px rgba(16,24,40,.08);
-      --radius:16px;
+        /* 헤더 섹션 */
+        .header {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
 
-      --ok:#12b76a;
-      --warn:#f79009;
-      --bad:#f04438;
+        .logo {
+            font-weight: 900;
+            font-size: 24px;
+            color: var(--main-orange);
+            letter-spacing: -1px;
+        }
 
-      /* logo1(마스코트 원본) 배경 톤 근사 */
-      --splash-top:#FCB710;
-      --splash-bottom:#FBAA08;
-    }
+        /* 줍줍이 메시지 컨테이너 */
+        .mascot-section {
+            margin-top: 30px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Helvetica, Arial, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
+        .speech-bubble {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            font-weight: 500;
+            border: 2px solid var(--main-orange);
+        }
 
-    /* ===== Splash ===== */
-    .splash{
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(1200px 700px at 50% 35%, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 55%),
-        linear-gradient(180deg, var(--splash-top) 0%, var(--splash-bottom) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      opacity: 1;
-      transition: opacity 380ms ease;
-    }
-    .splash.fade-out{ opacity: 0; pointer-events:none; }
+        /* 메인 카드 UI */
+        .benefit-card {
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
 
-    .splash-content{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      padding: 24px;
-      text-align:center;
-    }
+        .category-tag {
+            background: #FFF0E6;
+            color: var(--main-orange);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
 
-    .splash img{
-      width: 160px;
-      height: 160px;
-      object-fit: contain;
-      background: transparent;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,.10));
-    }
+        .location-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
 
-    .splash-title{
-      font-weight: 900;
-      letter-spacing: -0.03em;
-      font-size: 20px;
-      line-height: 1.1;
-      color: rgba(16,24,40,.92);
-      text-shadow: 0 6px 14px rgba(255,255,255,.20);
-    }
-    .splash-subtitle{
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      font-size: 13px;
-      line-height: 1.2;
-      color: rgba(16,24,40,.72);
-    }
+        .benefit-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #F0F0F0;
+        }
 
-    /* ===== Header ===== */
-    header{
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--line);
-    }
-    .header-inner{
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 10px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-height: 28px;
-    }
+        .card-name { font-weight: 500; color: #666; }
+        .benefit-value { 
+            font-weight: 700; 
+            color: var(--main-orange); 
+            font-size: 18px;
+        }
 
-    /* 헤더 로고(logo3) 안 보이는 케이스 방지 */
-    .brand img{
-      width: 26px !important;
-      height: 26px !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
+        /* 액션 버튼 */
+        .cta-button {
+            width: 90%;
+            max-width: 400px;
+            background-color: var(--main-orange);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 5px 15px rgba(255,107,0,0.3);
+        }
 
-    .brand .name{
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      font-size: 15px;
-      line-height: 1;
-      white-space: nowrap;
-    }
+        .cta-button:active { transform: scale(0.98); }
 
-    /* 로고 로드 실패 시 표시되는 배지(디버그용) */
-    .logo-fail{
-      display:none;
-      font-size: 11px;
-      color: #b42318;
-      border: 1px solid rgba(180,35,24,.25);
-      background: rgba(254,243,242,.9);
-      padding: 6px 10px;
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-
-    main{
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-    .stack{ display:flex; flex-direction:column; gap:12px; }
-
-    /* ===== Pills / Alerts ===== */
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: #fff;
-      border: 1px solid var(--line);
-      color: var(--text);
-      font-size: 13px;
-      box-shadow: 0 6px 14px rgba(16,24,40,.05);
-      width: fit-content;
-      max-width: 100%;
-    }
-    .pill .dot{
-      width: 8px; height: 8px;
-      background: var(--brand);
-      border-radius: 999px;
-      flex: 0 0 auto;
-    }
-    .pill strong{ white-space: nowrap; }
-    .pill span{
-      color: var(--muted);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .notice{
-      border: 1px solid #ffd7b3;
-      background: #fff3ea;
-      border-radius: 12px;
-      padding: 12px;
-      color: #7a2e00;
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-    /* ===== Panels ===== */
-    .panel{
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 14px;
-    }
-    .panel h2{
-      margin: 0 0 10px;
-      font-size: 14px;
-      letter-spacing: -0.01em;
-    }
-
-    /* ===== Form ===== */
-    .form-grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    @media (min-width: 720px){
-      .form-grid{ grid-template-columns: 1fr 1fr; }
-    }
-
-    label{
-      display:block;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    select, input{
-      width: 100%;
-      padding: 12px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #fff;
-      outline: none;
-      font-size: 14px;
-      color: var(--text);
-    }
-    select:focus, input:focus{
-      border-color: rgba(255,122,0,.65);
-      box-shadow: 0 0 0 4px rgba(255,122,0,.15);
-    }
-
-    .btn-row{
-      display:flex;
-      gap:10px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-    .btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
-      border-radius: 12px;
-      padding: 11px 14px;
-      font-weight: 700;
-      font-size: 14px;
-    }
-    .btn.primary{
-      background: var(--brand);
-      color: #fff;
-      box-shadow: 0 10px 18px rgba(255,122,0,.25);
-    }
-    .btn.ghost{
-      background: #fff;
-      border: 1px solid var(--line);
-      color: var(--text);
-    }
-
-    /* ===== Results ===== */
-    .results-head{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap: wrap;
-    }
-    .results-head .sub{
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .hr{
-      height: 1px;
-      background: var(--line);
-      margin: 10px 0;
-    }
-
-    .cards{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    @media (min-width: 720px){
-      .cards{ grid-template-columns: 1fr 1fr; }
-    }
-
-    .rec-card{
-      position: relative;
-      overflow: hidden;
-      border-radius: 16px;
-      background: #fff;
-      border: 1px solid var(--line);
-      padding: 14px;
-      box-shadow: 0 10px 22px rgba(16,24,40,.06);
-      min-height: 132px;
-    }
-    .rec-card.top{
-      border-color: rgba(255,122,0,.55);
-      box-shadow: 0 14px 28px rgba(255,122,0,.18);
-    }
-    .rec-card .wm{
-      position: absolute;
-      right: 10px;
-      bottom: 10px;
-      width: 86px;
-      opacity: .08;
-      pointer-events: none;
-      user-select: none;
-    }
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 800;
-      border: 1px solid var(--line);
-      background: #fff;
-      width: fit-content;
-    }
-    .badge.ok{ border-color: rgba(18,183,106,.35); }
-    .badge.warn{ border-color: rgba(247,144,9,.35); }
-    .badge.bad{ border-color: rgba(240,68,56,.35); }
-
-    .rec-title{
-      margin-top: 10px;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing: -0.02em;
-    }
-    .rec-meta{
-      margin-top: 6px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .rec-desc{
-      margin-top: 10px;
-      color: #344054;
-      font-size: 13px;
-      line-height: 1.45;
-      padding-right: 70px;
-    }
-
-    .footnote{
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-  </style>
+        .footer-text {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
 </head>
-
 <body>
-  <!-- Splash -->
-  <div class="splash" id="splash" aria-hidden="true">
-    <div class="splash-content">
-      <img src="logo1.png" alt="줍줍 스플래시 로고" />
-      <div class="splash-title">줍줍</div>
-      <div class="splash-subtitle">나만의 결제 비서</div>
+
+    <div class="header">
+        <div class="logo">JUPJUP</div>
     </div>
-  </div>
 
-  <header>
-    <div class="header-inner">
-      <div class="brand" aria-label="줍줍 헤더">
-        <!-- ✅ 헤더 로고는 logo3만 사용 + 캐시 무효화 -->
-        <img id="headerLogo" src="./logo3.png?v=20260122" alt="줍줍 로고" />
-        <div class="name">줍줍</div>
-      </div>
-      <span id="logoFail" class="logo-fail">logo3 로드 실패</span>
-      <div style="font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap;">나만의 결제 비서</div>
+    <div class="mascot-section">
+        <div class="speech-bubble">
+            보스! <span id="category-text">매장</span>에 오셨군요?<br>
+            여기선 이 카드가 <b>가장 많이 줍줍</b>해요! 🐾
+        </div>
     </div>
-  </header>
 
-  <main>
-    <div class="stack">
-      <div id="storeWrap" style="display:none;">
-        <div class="pill" title="매장명">
-          <span class="dot" aria-hidden="true"></span>
-          <strong id="storeName">-</strong>
-          <span>에서 결제 중</span>
+    <div class="benefit-card">
+        <div class="category-tag" id="category-tag">Loading...</div>
+        <div class="location-name">내 주변 최적 혜택</div>
+        
+        <div class="benefit-row">
+            <span class="card-name">신한 Deep Dream</span>
+            <span class="benefit-value">5.0% 적립</span>
         </div>
-      </div>
-
-      <div id="qrNotice" class="notice" style="display:none;">
-        업종이 자동선택 됐습니다. 틀린경우 아래에서 수정해주세요.
-      </div>
-
-      <section class="panel" aria-label="결제 정보 입력">
-        <h2>결제 정보</h2>
-        <div class="form-grid">
-          <div>
-            <label for="categorySelect">업종</label>
-            <select id="categorySelect">
-              <option value="">업종 선택</option>
-              <option value="카페">카페</option>
-              <option value="음식점">음식점</option>
-              <option value="편의점">편의점</option>
-              <option value="대중교통">대중교통</option>
-              <option value="온라인">온라인</option>
-              <option value="기타">기타</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="amountInput">결제 금액 (선택)</label>
-            <input id="amountInput" inputmode="numeric" placeholder="예: 5400" />
-          </div>
+        <div class="benefit-row">
+            <span class="card-name">국내외 가맹점</span>
+            <span class="benefit-value">최대 1,500원 할인</span>
         </div>
-
-        <div class="btn-row">
-          <button class="btn primary" id="btnRecommend">지금 결제 추천 받기</button>
-          <button class="btn ghost" id="btnReset">초기화</button>
+        <div class="benefit-row" style="border:none;">
+            <span class="card-name">L.POINT 적립</span>
+            <span class="benefit-value">+0.5% 추가</span>
         </div>
- 
-      </section>
-
-      <section class="panel" aria-label="추천 결과">
-        <div class="results-head">
-          <h2 style="margin:0;">추천 결과</h2>
-          <div class="sub" id="resultSub">업종을 선택한 뒤 추천을 실행해 주십시오.</div>
-        </div>
-        <div class="hr"></div>
-        <div id="results" class="cards"></div>
-      </section>
     </div>
-  </main>
 
-  <script>
-    /*********************
-     * Splash: 0.8~1초 후 페이드아웃
-     *********************/
-    (function splash(){
-      const el = document.getElementById('splash');
-      const DURATION_MS = 900;
-      window.setTimeout(() => {
-        el.classList.add('fade-out');
-        window.setTimeout(() => { el.style.display = 'none'; }, 420);
-      }, DURATION_MS);
-    })();
+    <button class="cta-button" onclick="alert('마이데이터 연동 페이지로 이동합니다!')">
+        지금 바로 이 혜택으로 결제하기
+    </button>
 
-    /*********************
-     * 헤더 로고 로드 실패 감지(원인 확인용)
-     *********************/
-    (function headerLogoCheck(){
-      const img = document.getElementById('headerLogo');
-      const fail = document.getElementById('logoFail');
+    <div class="footer-text">© 2026 JUPJUP. All rights reserved.</div>
 
-      img.addEventListener('error', () => {
-        fail.style.display = 'inline-flex';
-        console.log('[JUPJUP] logo3 load failed:', img.currentSrc || img.src);
-      });
-
-      img.addEventListener('load', () => {
-        fail.style.display = 'none';
-      });
-    })();
-
-    /*********************
-     * URL Params
-     * category=카페|음식점|편의점 → 업종 자동 선택
-     * store=스타벅스 → 매장명 표시
-     *********************/
-    const params = new URLSearchParams(window.location.search);
-
-    function safeDecode(value){
-      try { return decodeURIComponent(value || ''); } catch(e){ return value || ''; }
-    }
-    function normalizeCategory(v){
-      const s = (v || '').trim();
-      const allowed = ["카페","음식점","편의점","대중교통","온라인","기타"];
-      if (allowed.includes(s)) return s;
-      const map = { "카페/디저트":"카페", "식당":"음식점", "레스토랑":"음식점" };
-      return map[s] || "";
-    }
-    function scoreToBadge(score){
-      if (score >= 75) return { cls:"ok", label:"강력 추천" };
-      if (score >= 55) return { cls:"warn", label:"추천" };
-      return { cls:"bad", label:"비추천" };
-    }
-    function formatCurrency(n){
-      const v = Number(String(n).replace(/[^0-9]/g,''));
-      if (!Number.isFinite(v) || v <= 0) return "";
-      return v.toLocaleString('ko-KR') + "원";
-    }
-
-    const pStore = safeDecode(params.get('store') || '').trim();
-    const pCategory = normalizeCategory(safeDecode(params.get('category') || '').trim());
-
-    const storeWrap = document.getElementById('storeWrap');
-    const storeName = document.getElementById('storeName');
-    const qrNotice  = document.getElementById('qrNotice');
-    const categorySelect = document.getElementById('categorySelect');
-    const amountInput = document.getElementById('amountInput');
-    const resultsEl = document.getElementById('results');
-    const resultSub = document.getElementById('resultSub');
-
-    if (pStore){
-      storeName.textContent = pStore;
-      storeWrap.style.display = 'block';
-    }
-    if (pCategory){
-      categorySelect.value = pCategory;
-      qrNotice.style.display = 'block';
-    }
-
-    const dummyCards = [
-      {
-        issuer: "신한",
-        name: "신한 딥드림(더미)",
-        requirements: { monthlySpendMin: 300000 },
-        user: { monthlySpent: 420000 },
-        rules: [
-          { category:["카페"], note:"카페 10% (월 5천원)" },
-          { category:["음식점"], note:"음식점 5% (월 7천원)" },
-          { category:["편의점"], note:"편의점 2% (월 3천원)" }
-        ],
-        fallback: { note:"기본 혜택 없음(더미)" }
-      },
-      {
-        issuer: "국민",
-        name: "KB 해피포인트(더미)",
-        requirements: { monthlySpendMin: 400000 },
-        user: { monthlySpent: 260000 },
-        rules: [
-          { category:["카페"], note:"카페 7% (월 6천원)" },
-          { category:["편의점"], note:"편의점 8% (월 4천원)" }
-        ],
-        fallback: { note:"기본 혜택 없음(더미)" }
-      },
-      {
-        issuer: "현대",
-        name: "현대 제로(더미)",
-        requirements: { monthlySpendMin: 0 },
-        user: { monthlySpent: 0 },
-        rules: [
-          { category:["온라인"], note:"온라인 2% (월 8천원)" },
-          { category:["기타"], note:"기본 1% (가정)" }
-        ],
-        fallback: { note:"기본 1% (가정)" }
-      }
-    ];
-
-    function inferIssuerAffinity(store){
-      const s = (store || "").toLowerCase();
-      if (s.includes("스타벅스") || s.includes("starbucks")) return "신한";
-      if (s.includes("gs") || s.includes("gs25")) return "국민";
-      if (s.includes("cu")) return "현대";
-      return "";
-    }
-    function findRule(card, category){
-      return card.rules.find(r => (r.category || []).includes(category)) || null;
-    }
-    function computeScore(card, category, store){
-      let score = 0;
-
-      const rule = findRule(card, category);
-      if (rule) score += 50;
-      else score += 10;
-
-      const req = Number(card.requirements?.monthlySpendMin || 0);
-      const spent = Number(card.user?.monthlySpent || 0);
-      const met = (req === 0) ? true : (spent >= req);
-      score += met ? 25 : -10;
-
-      const affinity = inferIssuerAffinity(store);
-      if (affinity && affinity === card.issuer) score += 15;
-
-      score = Math.max(0, Math.min(100, score));
-      return { score, met, rule, affinity };
-    }
-
-    function renderResults(category){
-      resultsEl.innerHTML = "";
-
-      if (!category){
-        resultSub.textContent = "업종을 선택한 뒤 추천을 실행해 주십시오.";
-        return;
-      }
-
-      const store = pStore || "";
-      const ranked = dummyCards
-        .map(card => ({ card, ...computeScore(card, category, store) }))
-        .sort((a,b) => b.score - a.score);
-
-      const amountText = formatCurrency(amountInput.value);
-      const ctx = ["업종: " + category];
-      if (pStore) ctx.push("매장: " + pStore);
-      if (amountText) ctx.push("금액: " + amountText);
-      resultSub.textContent = ctx.join(" · ");
-
-      ranked.forEach((item, idx) => {
-        const { card, score, met, rule, affinity } = item;
-        const badge = scoreToBadge(score);
-
-        const benefitText = rule?.note || card.fallback?.note || "혜택 정보 없음(더미)";
-        const req = Number(card.requirements?.monthlySpendMin || 0);
-        const perfText = (req === 0)
-          ? "전월실적 조건 없음"
-          : ("전월실적 " + req.toLocaleString('ko-KR') + "원 " + (met ? "충족" : "미충족"));
-
-        const affinityText = affinity
-          ? ("가맹점 추정 카드사: " + affinity + (affinity === card.issuer ? " (일치)" : " (불일치)"))
-          : "가맹점 카드사 추정 불가";
-
-        const el = document.createElement("div");
-        el.className = "rec-card" + (idx === 0 ? " top" : "");
-        el.innerHTML = `
-          <div class="badge ${badge.cls}">
-            ${idx === 0 ? "1순위" : (idx+1) + "순위"} · ${badge.label} (${score}점)
-          </div>
-          <div class="rec-title">${card.name}</div>
-          <div class="rec-meta">
-            <span>카드사: ${card.issuer}</span>
-            <span>·</span>
-            <span>${perfText}</span>
-          </div>
-          <div class="rec-desc">
-            <strong>혜택:</strong> ${benefitText}<br/>
-            <span style="color:var(--muted);">${affinityText}</span>
-          </div>
-          <img class="wm" src="./logo3.png?v=20260122" alt="" aria-hidden="true" />
-        `;
-        resultsEl.appendChild(el);
-      });
-    }
-
-    document.getElementById("btnRecommend").addEventListener("click", () => {
-      renderResults(categorySelect.value);
-    });
-
-    document.getElementById("btnReset").addEventListener("click", () => {
-      categorySelect.value = pCategory || "";
-      amountInput.value = "";
-      renderResults(categorySelect.value);
-    });
-
-    if (pCategory){
-      renderResults(categorySelect.value);
-    }
-  </script>
+    <script>
+        // URL 파라미터 읽기 로직
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('category') || '매장';
+        
+        document.getElementById('category-text').innerText = category;
+        document.getElementById('category-tag').innerText = category;
+    </script>
 </body>
 </html>
-
-
-
-
-
-
-
 
