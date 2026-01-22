@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>줍줍 | 업종 선택</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>줍줍 | 업종별 QR 링크</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     :root{
@@ -14,94 +14,101 @@
       --muted:#6b7280;
       --shadow: 0 8px 18px rgba(0,0,0,0.12);
       --radius: 18px;
+      --line: rgba(0,0,0,0.08);
     }
 
-    body {
+    body{
       font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
       background: linear-gradient(135deg, var(--bg1), var(--bg2));
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
 
-    .container {
-      width: 100%;
-      max-width: 420px;
-      padding: 24px;
-      box-sizing: border-box;
+    .wrap{
+      width:100%;
+      max-width:420px;
+      padding:24px;
+      box-sizing:border-box;
     }
 
     .panel{
-      background: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.75);
       backdrop-filter: blur(6px);
       border-radius: var(--radius);
       padding: 22px;
       box-shadow: var(--shadow);
     }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 22px;
-      color: var(--text);
-      text-align: center;
+    h1{
+      margin:0 0 10px;
+      font-size:20px;
+      text-align:center;
+      color:var(--text);
     }
 
-    p {
-      margin: 0 0 18px;
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.5;
-      font-size: 14px;
+    p{
+      margin:0 0 14px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      text-align:center;
     }
 
-    .category-btn {
-      width: 100%;
-      padding: 16px;
-      margin: 10px 0;
-      font-size: 17px;
-      border: none;
-      border-radius: 16px;
+    a.btn{
+      display:block;
+      text-decoration:none;
       background: var(--card);
-      cursor: pointer;
-      font-weight: 800;
+      border: 1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      font-weight:900;
+      color:var(--text);
+      margin-top:10px;
       box-shadow: 0 6px 12px rgba(0,0,0,0.10);
-      transition: transform 0.08s ease;
+      text-align:center;
     }
 
-    .category-btn:active {
-      transform: scale(0.98);
+    .small{
+      margin-top:14px;
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
     }
 
-    .small-note{
-      margin-top: 14px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 12px;
+    code{
+      display:block;
+      background: rgba(255,255,255,0.85);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px;
+      font-size:12px;
+      overflow:auto;
+      margin-top:10px;
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
+  <div class="wrap">
     <div class="panel">
-      <h1>결제하실 곳은 어디인가요?</h1>
-      <p>업종을 선택하면, 결제 직전에 가장 유리한 카드를 추천해 드립니다!!</p>
+      <h1>업종별 QR 링크(관리/테스트용)</h1>
+      <p>실전 운영은 업종별로 다른 URL을 QR로 만들어 매장에 부착하시면 됩니다.</p>
 
-      <button class="category-btn" onclick="go('카페')">☕ 카페</button>
-      <button class="category-btn" onclick="go('음식점')">🍽 음식점</button>
-      <button class="category-btn" onclick="go('편의점')">🏪 편의점</button>
+      <a class="btn" href="index.html?category=카페&from=qr">☕ 카페 QR 링크</a>
+      <a class="btn" href="index.html?category=음식점&from=qr">🍽 음식점 QR 링크</a>
+      <a class="btn" href="index.html?category=편의점&from=qr">🏪 편의점 QR 링크</a>
 
-      <div class="small-note">* 선택 후 다음 화면에서 업종을 다시 변경할 수 있습니다.</div>
+      <div class="small">QR 생성 시 아래 URL을 그대로 넣으시면 됩니다.</div>
+
+      <code>
+카페: /index.html?category=카페&from=qr
+음식점: /index.html?category=음식점&from=qr
+편의점: /index.html?category=편의점&from=qr
+      </code>
     </div>
   </div>
-
-  <script>
-    function go(category) {
-      location.href = `index.html?category=${encodeURIComponent(category)}&from=qr`;
-    }
-  </script>
 </body>
 </html>
