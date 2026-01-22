@@ -7,646 +7,369 @@
   <meta name="description" content="결제 직전, 가장 유리한 결제수단을 추천하는 줍줍(JUPJUP)" />
 
   <style>
-    :root{
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --text:#101828;
-      --muted:#667085;
-      --line:#e4e7ec;
+    :root {
+      --bg: #f8f9fc;
+      --card: #ffffff;
+      --text: #101828;
+      --muted: #475467;
+      --line: #eaecf0;
 
-      --brand:#ff7a00;
-      --brand-weak:#fff1e6;
-      --shadow: 0 10px 25px rgba(16,24,40,.08);
-      --radius:16px;
+      /* 브랜드 컬러: 도파민 오렌지 조합 */
+      --brand: #FF6B00;
+      --brand-weak: #fff1e6;
+      --brand-dark: #E66000;
+      
+      --shadow: 0 12px 16px -4px rgba(16, 24, 40, 0.08);
+      --radius: 20px;
 
-      --ok:#12b76a;
-      --warn:#f79009;
-      --bad:#f04438;
+      --ok: #027a48;
+      --ok-bg: #ecfdf3;
+      --warn: #b44d12;
+      --warn-bg: #fffaeb;
+      --bad: #b42318;
+      --bad-bg: #fef3f2;
 
-      /* logo1(마스코트 원본) 배경 톤 근사 */
-      --splash-top:#FCB710;
-      --splash-bottom:#FBAA08;
+      /* 스플래시 배경 */
+      --splash-top: #FF6B00;
+      --splash-bottom: #FF8533;
     }
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Helvetica, Arial, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-      background:var(--bg);
-      color:var(--text);
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
     }
 
     /* ===== Splash ===== */
-    .splash{
+    .splash {
       position: fixed;
       inset: 0;
-      background:
-        radial-gradient(1200px 700px at 50% 35%, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 55%),
-        linear-gradient(180deg, var(--splash-top) 0%, var(--splash-bottom) 100%);
+      background: linear-gradient(180deg, var(--splash-top) 0%, var(--splash-bottom) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
       opacity: 1;
-      transition: opacity 380ms ease;
+      transition: opacity 400ms ease;
     }
-    .splash.fade-out{ opacity: 0; pointer-events:none; }
+    .splash.fade-out { opacity: 0; pointer-events: none; }
 
-    .splash-content{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      padding: 24px;
-      text-align:center;
+    .splash-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
     }
 
-    .splash img{
-      width: 160px;
-      height: 160px;
+    .splash img {
+      width: 140px;
+      height: 140px;
       object-fit: contain;
-      background: transparent;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,.10));
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
     }
 
-    .splash-title{
+    .splash-title {
       font-weight: 900;
-      letter-spacing: -0.03em;
-      font-size: 20px;
-      line-height: 1.1;
-      color: rgba(16,24,40,.92);
-      text-shadow: 0 6px 14px rgba(255,255,255,.20);
+      font-size: 28px;
+      color: white;
+      letter-spacing: -0.04em;
     }
-    .splash-subtitle{
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      font-size: 13px;
-      line-height: 1.2;
-      color: rgba(16,24,40,.72);
+    .splash-subtitle {
+      font-weight: 600;
+      font-size: 14px;
+      color: rgba(255,255,255,0.9);
     }
 
     /* ===== Header ===== */
-    header{
+    header {
       position: sticky;
       top: 0;
       z-index: 50;
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--line);
     }
-    .header-inner{
-      max-width: 920px;
+    .header-inner {
+      max-width: 600px;
       margin: 0 auto;
-      padding: 10px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-height: 28px;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-
-    /* 헤더 로고(logo3) 안 보이는 케이스 방지 */
-    .brand img{
-      width: 26px !important;
-      height: 26px !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
-
-    .brand .name{
+    .brand img { width: 28px; height: 28px; object-fit: contain; }
+    .brand .name {
       font-weight: 800;
+      font-size: 18px;
+      color: var(--brand);
       letter-spacing: -0.02em;
-      font-size: 15px;
-      line-height: 1;
-      white-space: nowrap;
     }
 
-    /* 로고 로드 실패 시 표시되는 배지(디버그용) */
-    .logo-fail{
-      display:none;
-      font-size: 11px;
-      color: #b42318;
-      border: 1px solid rgba(180,35,24,.25);
-      background: rgba(254,243,242,.9);
-      padding: 6px 10px;
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-
-    main{
-      max-width: 920px;
+    main {
+      max-width: 600px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 20px 16px;
     }
-    .stack{ display:flex; flex-direction:column; gap:12px; }
+    .stack { display: flex; flex-direction: column; gap: 16px; }
 
-    /* ===== Pills / Alerts ===== */
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 12px;
+    /* ===== UI Elements ===== */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
       border-radius: 999px;
-      background: #fff;
+      background: white;
       border: 1px solid var(--line);
-      color: var(--text);
-      font-size: 13px;
-      box-shadow: 0 6px 14px rgba(16,24,40,.05);
-      width: fit-content;
-      max-width: 100%;
+      font-size: 14px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
     }
-    .pill .dot{
-      width: 8px; height: 8px;
-      background: var(--brand);
-      border-radius: 999px;
-      flex: 0 0 auto;
-    }
-    .pill strong{ white-space: nowrap; }
-    .pill span{
-      color: var(--muted);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+    .pill .dot { width: 8px; height: 8px; background: var(--brand); border-radius: 50%; }
 
-    .notice{
-      border: 1px solid #ffd7b3;
-      background: #fff3ea;
+    .notice {
+      background: var(--brand-weak);
       border-radius: 12px;
-      padding: 12px;
-      color: #7a2e00;
+      padding: 12px 16px;
+      color: var(--brand-dark);
       font-size: 13px;
-      line-height: 1.4;
+      font-weight: 600;
     }
 
-    /* ===== Panels ===== */
-    .panel{
+    .panel {
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 14px;
+      padding: 20px;
     }
-    .panel h2{
-      margin: 0 0 10px;
-      font-size: 14px;
-      letter-spacing: -0.01em;
-    }
+    .panel h2 { margin: 0 0 16px; font-size: 15px; font-weight: 700; color: var(--muted); }
 
-    /* ===== Form ===== */
-    .form-grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    @media (min-width: 720px){
-      .form-grid{ grid-template-columns: 1fr 1fr; }
-    }
-
-    label{
-      display:block;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    select, input{
+    .form-grid { display: flex; flex-direction: column; gap: 16px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    select, input {
       width: 100%;
-      padding: 12px 12px;
+      padding: 14px;
       border-radius: 12px;
       border: 1px solid var(--line);
       background: #fff;
+      font-size: 15px;
       outline: none;
-      font-size: 14px;
-      color: var(--text);
+      transition: all 0.2s;
     }
-    select:focus, input:focus{
-      border-color: rgba(255,122,0,.65);
-      box-shadow: 0 0 0 4px rgba(255,122,0,.15);
-    }
+    select:focus, input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-weak); }
 
-    .btn-row{
-      display:flex;
-      gap:10px;
-      flex-wrap: wrap;
-      margin-top: 8px;
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
     }
-    .btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
+    .btn.primary { background: var(--brand); color: white; margin-top: 8px; }
+    .btn.primary:active { background: var(--brand-dark); transform: scale(0.98); }
+    .btn.ghost { background: transparent; color: var(--muted); padding: 8px; font-size: 14px; }
+
+    /* ===== Result Cards ===== */
+    .rec-card {
+      position: relative;
+      border-radius: var(--radius);
+      background: white;
+      border: 1px solid var(--line);
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+    .rec-card.top {
+      border: 2px solid var(--brand);
+      background: linear-gradient(180deg, #fff 0%, #fff9f5 100%);
+      box-shadow: 0 10px 20px rgba(255,107,0,0.1);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .badge.ok { background: var(--ok-bg); color: var(--ok); }
+    .badge.warn { background: var(--warn-bg); color: var(--warn); }
+    .badge.bad { background: var(--bad-bg); color: var(--bad); }
+
+    .rec-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .rec-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    
+    .benefit-highlight {
+      background: var(--brand-weak);
+      color: var(--brand);
+      padding: 12px;
       border-radius: 12px;
-      padding: 11px 14px;
       font-weight: 700;
       font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .btn.primary{
-      background: var(--brand);
-      color: #fff;
-      box-shadow: 0 10px 18px rgba(255,122,0,.25);
-    }
-    .btn.ghost{
-      background: #fff;
-      border: 1px solid var(--line);
-      color: var(--text);
-    }
+    .wm { position: absolute; right: 16px; top: 16px; width: 40px; opacity: 0.05; pointer-events: none; }
 
-    /* ===== Results ===== */
-    .results-head{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap: wrap;
-    }
-    .results-head .sub{
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .hr{
-      height: 1px;
-      background: var(--line);
-      margin: 10px 0;
-    }
-
-    .cards{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    @media (min-width: 720px){
-      .cards{ grid-template-columns: 1fr 1fr; }
-    }
-
-    .rec-card{
-      position: relative;
-      overflow: hidden;
-      border-radius: 16px;
-      background: #fff;
-      border: 1px solid var(--line);
-      padding: 14px;
-      box-shadow: 0 10px 22px rgba(16,24,40,.06);
-      min-height: 132px;
-    }
-    .rec-card.top{
-      border-color: rgba(255,122,0,.55);
-      box-shadow: 0 14px 28px rgba(255,122,0,.18);
-    }
-    .rec-card .wm{
-      position: absolute;
-      right: 10px;
-      bottom: 10px;
-      width: 86px;
-      opacity: .08;
-      pointer-events: none;
-      user-select: none;
-    }
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 800;
-      border: 1px solid var(--line);
-      background: #fff;
-      width: fit-content;
-    }
-    .badge.ok{ border-color: rgba(18,183,106,.35); }
-    .badge.warn{ border-color: rgba(247,144,9,.35); }
-    .badge.bad{ border-color: rgba(240,68,56,.35); }
-
-    .rec-title{
-      margin-top: 10px;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing: -0.02em;
-    }
-    .rec-meta{
-      margin-top: 6px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .rec-desc{
-      margin-top: 10px;
-      color: #344054;
-      font-size: 13px;
-      line-height: 1.45;
-      padding-right: 70px;
-    }
-
-    .footnote{
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
+    .footnote { font-size: 12px; color: #98a2b3; margin-top: 12px; text-align: center; }
   </style>
 </head>
 
 <body>
-  <!-- Splash -->
-  <div class="splash" id="splash" aria-hidden="true">
+  <div class="splash" id="splash">
     <div class="splash-content">
-      <img src="logo1.png" alt="줍줍 스플래시 로고" />
-      <div class="splash-title">줍줍</div>
-      <div class="splash-subtitle">나만의 결제 비서</div>
+      <img src="logo1.png" alt="줍줍" />
+      <div class="splash-title">JUPJUP</div>
+      <div class="splash-subtitle">결제 전, 1초의 기적</div>
     </div>
   </div>
 
   <header>
     <div class="header-inner">
-      <div class="brand" aria-label="줍줍 헤더">
-        <!-- ✅ 헤더 로고는 logo3만 사용 + 캐시 무효화 -->
-        <img id="headerLogo" src="./logo3.png?v=20260122" alt="줍줍 로고" />
-        <div class="name">줍줍</div>
+      <div class="brand">
+        <img src="./logo3.png" alt="로고" />
+        <div class="name">JUPJUP</div>
       </div>
-      <span id="logoFail" class="logo-fail">logo3 로드 실패</span>
-      <div style="font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap;">나만의 결제 비서</div>
+      <div style="font-size:12px; color:var(--muted); font-weight:600;">스마트 결제 비서</div>
     </div>
   </header>
 
   <main>
     <div class="stack">
       <div id="storeWrap" style="display:none;">
-        <div class="pill" title="매장명">
-          <span class="dot" aria-hidden="true"></span>
-          <strong id="storeName">-</strong>
-          <span>에서 결제 중</span>
+        <div class="pill">
+          <span class="dot"></span>
+          <strong id="storeName">-</strong> 에서 줍줍 준비 완료!
         </div>
       </div>
 
       <div id="qrNotice" class="notice" style="display:none;">
-        QR로 업종을 자동 선택했습니다. 필요하면 아래에서 직접 변경하실 수 있습니다.
+        📍 QR 인식 결과, 최적의 혜택을 불러왔습니다.
       </div>
 
-      <section class="panel" aria-label="결제 정보 입력">
-        <h2>결제 정보</h2>
+      <section class="panel">
+        <h2>어디서 결제하시나요?</h2>
         <div class="form-grid">
           <div>
-            <label for="categorySelect">업종</label>
+            <label>업종 선택</label>
             <select id="categorySelect">
               <option value="">업종 선택</option>
-              <option value="카페">카페</option>
-              <option value="음식점">음식점</option>
-              <option value="편의점">편의점</option>
-              <option value="대중교통">대중교통</option>
-              <option value="온라인">온라인</option>
-              <option value="기타">기타</option>
+              <option value="카페">☕ 카페/디저트</option>
+              <option value="음식점">🍱 음식점/식당</option>
+              <option value="편의점">🏪 편의점/마트</option>
+              <option value="대중교통">🚌 대중교통</option>
+              <option value="온라인">💻 온라인 쇼핑</option>
+              <option value="기타">ETC 기타</option>
             </select>
           </div>
-
           <div>
-            <label for="amountInput">결제 금액 (선택)</label>
-            <input id="amountInput" inputmode="numeric" placeholder="예: 5400" />
+            <label>결제 금액 (예상)</label>
+            <input id="amountInput" type="number" pattern="\[0-9]*" inputmode="numeric" placeholder="금액을 입력하면 정확한 혜택 계산이 가능해요" />
           </div>
         </div>
-
-        <div class="btn-row">
-          <button class="btn primary" id="btnRecommend">지금 결제 추천 받기</button>
-          <button class="btn ghost" id="btnReset">초기화</button>
-        </div>
-
-        <div class="footnote">
-          현재는 예비창업패키지 제출용 MVP로 더미 카드(신한/국민/현대)로 동작합니다. 실제 혜택 데이터는 다음 단계에서 구조화합니다.
-        </div>
+        <button class="btn primary" id="btnRecommend">혜택 비교하기</button>
+        <button class="btn ghost" id="btnReset">다시 선택하기</button>
       </section>
 
-      <section class="panel" aria-label="추천 결과">
-        <div class="results-head">
-          <h2 style="margin:0;">추천 결과</h2>
-          <div class="sub" id="resultSub">업종을 선택한 뒤 추천을 실행해 주십시오.</div>
+      <section class="panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h2 style="margin:0;">추천 카드 랭킹</h2>
+          <span id="resultSub" style="font-size:12px; color:var(--brand); font-weight:600;"></span>
         </div>
-        <div class="hr"></div>
-        <div id="results" class="cards"></div>
+        <div id="results">
+          <div style="text-align:center; padding:40px 0; color:#98a2b3; font-size:14px;">
+            업종을 선택하고 버튼을 눌러주세요!
+          </div>
+        </div>
+        <div class="footnote">
+          본 데이터는 MVP 테스트용 가상 데이터입니다.<br/>실제 마이데이터 연동 시 실시간 혜택이 적용됩니다.
+        </div>
       </section>
     </div>
   </main>
 
   <script>
-    /*********************
-     * Splash: 0.8~1초 후 페이드아웃
-     *********************/
-    (function splash(){
-      const el = document.getElementById('splash');
-      const DURATION_MS = 900;
-      window.setTimeout(() => {
-        el.classList.add('fade-out');
-        window.setTimeout(() => { el.style.display = 'none'; }, 420);
-      }, DURATION_MS);
-    })();
+    // Splash logic
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const s = document.getElementById('splash');
+        s.classList.add('fade-out');
+        setTimeout(() => s.style.display = 'none', 400);
+      }, 900);
+    });
 
-    /*********************
-     * 헤더 로고 로드 실패 감지(원인 확인용)
-     *********************/
-    (function headerLogoCheck(){
-      const img = document.getElementById('headerLogo');
-      const fail = document.getElementById('logoFail');
-
-      img.addEventListener('error', () => {
-        fail.style.display = 'inline-flex';
-        console.log('[JUPJUP] logo3 load failed:', img.currentSrc || img.src);
-      });
-
-      img.addEventListener('load', () => {
-        fail.style.display = 'none';
-      });
-    })();
-
-    /*********************
-     * URL Params
-     * category=카페|음식점|편의점 → 업종 자동 선택
-     * store=스타벅스 → 매장명 표시
-     *********************/
     const params = new URLSearchParams(window.location.search);
+    const pStore = decodeURIComponent(params.get('store') || '').trim();
+    const pCategory = params.get('category') || '';
 
-    function safeDecode(value){
-      try { return decodeURIComponent(value || ''); } catch(e){ return value || ''; }
-    }
-    function normalizeCategory(v){
-      const s = (v || '').trim();
-      const allowed = ["카페","음식점","편의점","대중교통","온라인","기타"];
-      if (allowed.includes(s)) return s;
-      const map = { "카페/디저트":"카페", "식당":"음식점", "레스토랑":"음식점" };
-      return map[s] || "";
-    }
-    function scoreToBadge(score){
-      if (score >= 75) return { cls:"ok", label:"강력 추천" };
-      if (score >= 55) return { cls:"warn", label:"추천" };
-      return { cls:"bad", label:"비추천" };
-    }
-    function formatCurrency(n){
-      const v = Number(String(n).replace(/[^0-9]/g,''));
-      if (!Number.isFinite(v) || v <= 0) return "";
-      return v.toLocaleString('ko-KR') + "원";
-    }
-
-    const pStore = safeDecode(params.get('store') || '').trim();
-    const pCategory = normalizeCategory(safeDecode(params.get('category') || '').trim());
-
-    const storeWrap = document.getElementById('storeWrap');
-    const storeName = document.getElementById('storeName');
-    const qrNotice  = document.getElementById('qrNotice');
     const categorySelect = document.getElementById('categorySelect');
+    const storeName = document.getElementById('storeName');
+    const storeWrap = document.getElementById('storeWrap');
+    const qrNotice = document.getElementById('qrNotice');
     const amountInput = document.getElementById('amountInput');
     const resultsEl = document.getElementById('results');
     const resultSub = document.getElementById('resultSub');
 
-    if (pStore){
-      storeName.textContent = pStore;
-      storeWrap.style.display = 'block';
-    }
-    if (pCategory){
-      categorySelect.value = pCategory;
-      qrNotice.style.display = 'block';
-    }
+    if (pStore) { storeName.textContent = pStore; storeWrap.style.display = 'block'; }
+    if (pCategory) { categorySelect.value = pCategory; qrNotice.style.display = 'block'; }
 
     const dummyCards = [
-      {
-        issuer: "신한",
-        name: "신한 딥드림(더미)",
-        requirements: { monthlySpendMin: 300000 },
-        user: { monthlySpent: 420000 },
-        rules: [
-          { category:["카페"], note:"카페 10% (월 5천원)" },
-          { category:["음식점"], note:"음식점 5% (월 7천원)" },
-          { category:["편의점"], note:"편의점 2% (월 3천원)" }
-        ],
-        fallback: { note:"기본 혜택 없음(더미)" }
-      },
-      {
-        issuer: "국민",
-        name: "KB 해피포인트(더미)",
-        requirements: { monthlySpendMin: 400000 },
-        user: { monthlySpent: 260000 },
-        rules: [
-          { category:["카페"], note:"카페 7% (월 6천원)" },
-          { category:["편의점"], note:"편의점 8% (월 4천원)" }
-        ],
-        fallback: { note:"기본 혜택 없음(더미)" }
-      },
-      {
-        issuer: "현대",
-        name: "현대 제로(더미)",
-        requirements: { monthlySpendMin: 0 },
-        user: { monthlySpent: 0 },
-        rules: [
-          { category:["온라인"], note:"온라인 2% (월 8천원)" },
-          { category:["기타"], note:"기본 1% (가정)" }
-        ],
-        fallback: { note:"기본 1% (가정)" }
-      }
+      { issuer: "신한", name: "신한 Deep Dream", score: 95, benefit: "카페 10% 적립 (최대 5천원)", note: "실적 충족 · 웰컴 혜택 적용 중" },
+      { issuer: "국민", name: "KB 해피포인트", score: 72, benefit: "편의점 8% 할인", note: "실적 미달 (14만원 부족)" },
+      { issuer: "현대", name: "현대 카드 ZERO", score: 60, benefit: "모든 가맹점 1% 할인", note: "무조건 혜택 적용" }
     ];
 
-    function inferIssuerAffinity(store){
-      const s = (store || "").toLowerCase();
-      if (s.includes("스타벅스") || s.includes("starbucks")) return "신한";
-      if (s.includes("gs") || s.includes("gs25")) return "국민";
-      if (s.includes("cu")) return "현대";
-      return "";
-    }
-    function findRule(card, category){
-      return card.rules.find(r => (r.category || []).includes(category)) || null;
-    }
-    function computeScore(card, category, store){
-      let score = 0;
+    function renderResults() {
+      const cat = categorySelect.value;
+      if (!cat) return;
 
-      const rule = findRule(card, category);
-      if (rule) score += 50;
-      else score += 10;
-
-      const req = Number(card.requirements?.monthlySpendMin || 0);
-      const spent = Number(card.user?.monthlySpent || 0);
-      const met = (req === 0) ? true : (spent >= req);
-      score += met ? 25 : -10;
-
-      const affinity = inferIssuerAffinity(store);
-      if (affinity && affinity === card.issuer) score += 15;
-
-      score = Math.max(0, Math.min(100, score));
-      return { score, met, rule, affinity };
-    }
-
-    function renderResults(category){
       resultsEl.innerHTML = "";
+      resultSub.textContent = cat + " 카테고리 분석 중...";
 
-      if (!category){
-        resultSub.textContent = "업종을 선택한 뒤 추천을 실행해 주십시오.";
-        return;
-      }
+      dummyCards.forEach((card, idx) => {
+        const cls = idx === 0 ? "top" : "";
+        const badgeCls = card.score >= 80 ? "ok" : (card.score >= 60 ? "warn" : "bad");
+        const badgeLabel = card.score >= 80 ? "최적 혜택" : "일반 혜택";
 
-      const store = pStore || "";
-      const ranked = dummyCards
-        .map(card => ({ card, ...computeScore(card, category, store) }))
-        .sort((a,b) => b.score - a.score);
-
-      const amountText = formatCurrency(amountInput.value);
-      const ctx = ["업종: " + category];
-      if (pStore) ctx.push("매장: " + pStore);
-      if (amountText) ctx.push("금액: " + amountText);
-      resultSub.textContent = ctx.join(" · ");
-
-      ranked.forEach((item, idx) => {
-        const { card, score, met, rule, affinity } = item;
-        const badge = scoreToBadge(score);
-
-        const benefitText = rule?.note || card.fallback?.note || "혜택 정보 없음(더미)";
-        const req = Number(card.requirements?.monthlySpendMin || 0);
-        const perfText = (req === 0)
-          ? "전월실적 조건 없음"
-          : ("전월실적 " + req.toLocaleString('ko-KR') + "원 " + (met ? "충족" : "미충족"));
-
-        const affinityText = affinity
-          ? ("가맹점 추정 카드사: " + affinity + (affinity === card.issuer ? " (일치)" : " (불일치)"))
-          : "가맹점 카드사 추정 불가";
-
-        const el = document.createElement("div");
-        el.className = "rec-card" + (idx === 0 ? " top" : "");
-        el.innerHTML = `
-          <div class="badge ${badge.cls}">
-            ${idx === 0 ? "1순위" : (idx+1) + "순위"} · ${badge.label} (${score}점)
-          </div>
+        const div = document.createElement('div');
+        div.className = `rec-card ${cls}`;
+        div.innerHTML = `
+          <div class="badge ${badgeCls}">${idx+1}순위 · ${badgeLabel} (${card.score}점)</div>
           <div class="rec-title">${card.name}</div>
-          <div class="rec-meta">
-            <span>카드사: ${card.issuer}</span>
-            <span>·</span>
-            <span>${perfText}</span>
+          <div class="rec-meta">${card.issuer}카드 | ${card.note}</div>
+          <div class="benefit-highlight">
+            💰 ${card.benefit}
           </div>
-          <div class="rec-desc">
-            <strong>혜택:</strong> ${benefitText}<br/>
-            <span style="color:var(--muted);">${affinityText}</span>
-          </div>
-          <img class="wm" src="./logo3.png?v=20260122" alt="" aria-hidden="true" />
+          <img src="logo3.png" class="wm" alt="" />
         `;
-        resultsEl.appendChild(el);
+        resultsEl.appendChild(div);
       });
     }
 
-    document.getElementById("btnRecommend").addEventListener("click", () => {
-      renderResults(categorySelect.value);
-    });
-
-    document.getElementById("btnReset").addEventListener("click", () => {
-      categorySelect.value = pCategory || "";
+    document.getElementById('btnRecommend').addEventListener('click', renderResults);
+    document.getElementById('btnReset').addEventListener('click', () => {
+      categorySelect.value = "";
       amountInput.value = "";
-      renderResults(categorySelect.value);
+      resultsEl.innerHTML = '<div style="text-align:center; padding:40px 0; color:#98a2b3; font-size:14px;">업종을 선택하고 버튼을 눌러주세요!</div>';
+      resultSub.textContent = "";
     });
 
-    if (pCategory){
-      renderResults(categorySelect.value);
-    }
+    if (pCategory) renderResults();
   </script>
 </body>
 </html>
+
 
 
