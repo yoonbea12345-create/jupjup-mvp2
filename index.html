@@ -259,6 +259,77 @@
 
     .rec-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.02em; }
     .rec-meta { font-size: 13px; color: var(--muted); margin-bottom: 14px; font-weight: 800; }
+/* ===== 1순위 카드: 오렌지 보더 + 반짝(샤인) 효과 ===== */
+
+/* 기본 top 스타일은 유지하면서, 애니메이션 레이어를 얹습니다 */
+.rec-card.top{
+  position: relative;
+}
+
+/* 움직이는 그라데이션 “테두리” 레이어 */
+.rec-card.top::before{
+  content:"";
+  position:absolute;
+  inset:-2px;                 /* 기존 2px 보더 바깥까지 살짝 */
+  border-radius: calc(var(--radius) + 2px);
+  background: linear-gradient(
+    110deg,
+    rgba(255,107,0,0.25) 0%,
+    rgba(255,107,0,0.95) 20%,
+    rgba(255,255,255,0.85) 35%,
+    rgba(255,107,0,0.95) 50%,
+    rgba(255,107,0,0.25) 100%
+  );
+  background-size: 220% 220%;
+  animation: jupupBorderShine 2.6s linear infinite;
+  z-index: 0;
+
+  /* 가운데(콘텐츠 영역) 뚫어서 “테두리만” 보이게 */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  padding: 2px;               /* 테두리 두께 */
+  pointer-events:none;
+}
+
+/* 은은한 글로우 레이어 */
+.rec-card.top::after{
+  content:"";
+  position:absolute;
+  inset:-10px;
+  border-radius: calc(var(--radius) + 10px);
+  background: radial-gradient(
+    60% 60% at 50% 30%,
+    rgba(255,107,0,0.22) 0%,
+    rgba(255,107,0,0.05) 55%,
+    rgba(255,107,0,0) 75%
+  );
+  filter: blur(6px);
+  opacity: .9;
+  z-index: 0;
+  pointer-events:none;
+}
+
+/* 콘텐츠가 가려지지 않도록 z-index 정리 */
+.rec-card.top > *{
+  position: relative;
+  z-index: 1;
+}
+
+/* 애니메이션: 테두리 그라데이션이 천천히 흐르는 느낌 */
+@keyframes jupupBorderShine{
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 사용자가 “동작 줄이기” 설정이면 애니메이션 제거 */
+@media (prefers-reduced-motion: reduce){
+  .rec-card.top::before{ animation: none; }
+}
 
     .benefit-highlight {
       background: var(--brand-weak);
@@ -613,5 +684,6 @@
   </script>
 </body>
 </html>
+
 
 
