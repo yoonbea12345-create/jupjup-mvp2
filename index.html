@@ -21,7 +21,6 @@
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--text)}
 
-    /* Splash */
     .splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
       background:linear-gradient(180deg,var(--splash-top),var(--splash-bottom));z-index:9999}
     .splash.fade-out{opacity:0;pointer-events:none;transition:.4s}
@@ -43,7 +42,7 @@
     label{font-size:13px;font-weight:800;color:var(--muted)}
     select,input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);margin-top:6px}
 
-    .btn{width:100%;border-radius:14px;padding:16px;font-weight:900;font-size:16px;border:none}
+    .btn{width:100%;border-radius:14px;padding:16px;font-weight:900;font-size:16px;border:none;position:relative}
     .btn.primary{background:var(--brand);color:#fff;margin-top:10px}
     .btn.primary:disabled{opacity:.6}
     .btn.primary.loading::after{
@@ -93,6 +92,9 @@
       <option value="카페">카페</option>
       <option value="음식점">음식점</option>
       <option value="편의점">편의점</option>
+      <option value="대중교통">대중교통</option>
+      <option value="온라인">온라인</option>
+      <option value="기타">기타</option>
     </select>
 
     <label style="margin-top:14px">결제 금액</label>
@@ -111,10 +113,18 @@
 </main>
 
 <script>
-window.onload=()=>setTimeout(()=>document.getElementById('splash').classList.add('fade-out'),900);
+window.onload=()=>{
+  setTimeout(()=>document.getElementById('splash').classList.add('fade-out'),900);
+
+  const params=new URLSearchParams(location.search);
+  const cat=params.get('category');
+  if(cat){
+    document.getElementById('category').value=decodeURIComponent(cat);
+  }
+};
 
 const btn=document.getElementById('recommend');
-const cat=document.getElementById('category');
+const catSel=document.getElementById('category');
 const res=document.getElementById('results');
 
 const cards=[
@@ -123,9 +133,16 @@ const cards=[
  {name:"현대 ZERO",score:40,why:"기본 할인 카드",benefit:"전가맹점 1%"}
 ];
 
+function refreshCTA(){
+  btn.disabled=!catSel.value||btn.classList.contains('loading');
+}
+catSel.onchange=refreshCTA;
+refreshCTA();
+
 btn.onclick=()=>{
- if(!cat.value)return;
- btn.classList.add('loading'); btn.textContent="혜택 계산 중…";
+ if(btn.disabled)return;
+ btn.classList.add('loading');
+ btn.textContent="혜택 계산 중…";
  setTimeout(()=>{
   res.innerHTML="";
   cards.forEach((c,i)=>{
@@ -137,13 +154,20 @@ btn.onclick=()=>{
         <div class="benefit-highlight">💰 ${c.benefit}</div>
       </div>`;
   });
-  btn.classList.remove('loading'); btn.textContent="카드 추천받기";
- },400);
+  btn.classList.remove('loading');
+  btn.textContent="카드 추천받기";
+  refreshCTA();
+ },380);
+};
+
+document.getElementById('reset').onclick=()=>{
+ catSel.value="";
+ res.innerHTML='<div style="text-align:center;color:#98a2b3;font-weight:900">업종을 선택하고 버튼을 눌러주십시오.</div>';
+ refreshCTA();
 };
 </script>
 </body>
 </html>
-
 
 
 
