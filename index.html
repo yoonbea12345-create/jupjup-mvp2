@@ -6,7 +6,6 @@
   <title>줍줍: 결제카드 추천 서비스</title>
   <meta name="description" content="결제 직전, 가장 유리한 결제수단을 추천하는 줍줍(JUPJUP)" />
 
-  <!-- ✅ favicon: logo1 -->
   <link rel="icon" href="/logo1.png?v=2" type="image/png" />
   <link rel="apple-touch-icon" href="/logo1.png?v=2" />
 
@@ -224,7 +223,6 @@
     .btn.primary:active { background: var(--brand-dark); transform: scale(0.98); }
     .btn.ghost { background: transparent; color: var(--muted); padding: 10px 8px; font-size: 14px; font-weight: 900; }
 
-    /* ✅ CTA 개선: disabled + loading 스피너 */
     .btn:disabled { opacity: 0.65; cursor: not-allowed; }
     .btn.primary.loading { cursor: progress; }
     .btn.primary.loading::after{
@@ -242,7 +240,6 @@
     }
     @keyframes jupupSpin { to { transform: translateY(-50%) rotate(360deg); } }
 
-    /* ===== Result Cards ===== */
     .rec-card {
       position: relative;
       border-radius: var(--radius);
@@ -274,7 +271,6 @@
     .rec-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.02em; }
     .rec-meta { font-size: 13px; color: var(--muted); margin-bottom: 14px; font-weight: 800; }
 
-    /* ===== 1순위 카드: 오렌지 보더 + 반짝(샤인) 효과 ===== */
     .rec-card.top::before{
       content:"";
       position:absolute;
@@ -334,7 +330,6 @@
       .rec-card.top::before{ animation: none; }
     }
 
-    /* ✅ 1순위 근거 1줄(표시만) */
     .why {
       font-size: 12px;
       font-weight: 900;
@@ -378,11 +373,61 @@
       font-weight: 900;
     }
 
-    /* ✅ 결과 “팝업” 느낌 */
     .pop { animation: popIn 240ms ease both; }
     @keyframes popIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
     .wm { display: none !important; }
+
+    /* ✅ 더치페이 UI */
+    .dutch-box{
+      margin-top: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 107, 0, 0.18);
+      background: var(--brand-weak);
+      padding: 14px;
+    }
+    .dutch-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .dutch-title{
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--brand-dark);
+      letter-spacing: -0.01em;
+    }
+    .dutch-total{
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(230,96,0,0.92);
+      white-space: nowrap;
+    }
+    .dutch-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .dutch-item{
+      background: rgba(255,255,255,0.80);
+      border: 1px solid rgba(255,255,255,0.92);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .dutch-item .n{
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .dutch-item .amt{
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
   </style>
 </head>
 
@@ -415,10 +460,6 @@
         </div>
       </div>
 
-      <div id="qrNotice" class="notice" style="display:none;">
-        결제장소와 금액을 확인해 주세요.
-      </div>
-
       <section class="panel" aria-label="결제 정보 입력">
         <div class="form-grid">
           <div>
@@ -436,7 +477,18 @@
 
           <div>
             <label for="amountInput">결제(예상) 금액</label>
-            <input id="amountInput" type="text" inputmode="numeric" placeholder="결제금액에 따라 최대 혜택이 달라질 수 있어요!" />
+            <input id="amountInput" type="text" inputmode="numeric" placeholder="결제금액에 따라 최대 혜택이 달라질 수 있어요" />
+          </div>
+        </div>
+
+        <div id="dutchWrap" style="display:none;">
+          <div class="dutch-box" aria-label="더치페이 계산">
+            <div class="dutch-head">
+              <div class="dutch-title">더치페이 계산</div>
+              <div class="dutch-total" id="dutchTotal">총액 -</div>
+            </div>
+            <div class="dutch-grid" id="dutchGrid"></div>
+            <div style="margin-top: 10px; font-size: 11px; font-weight: 800; color: rgba(71, 84, 103, 0.8);">※ 1인당 금액은 원 단위 내림 기준입니다.</div>
           </div>
         </div>
 
@@ -451,7 +503,7 @@
         </div>
 
         <div id="results">
-          <div class="muted-center">단 2초만에 잠자고 있던 내 카드 혜택을 찾아드려요!.</div>
+          <div class="muted-center">업종을 선택하고 버튼을 눌러주십시오.</div>
         </div>
       </section>
     </div>
@@ -498,15 +550,14 @@
     const amountInput = document.getElementById('amountInput');
     const resultsEl = document.getElementById('results');
     const resultSub = document.getElementById('resultSub');
-
     const storeWrap = document.getElementById('storeWrap');
     const storeName = document.getElementById('storeName');
-    const qrNotice = document.getElementById('qrNotice');
-
     const btnRecommend = document.getElementById('btnRecommend');
     const btnReset = document.getElementById('btnReset');
+    const dutchWrap = document.getElementById('dutchWrap');
+    const dutchTotal = document.getElementById('dutchTotal');
+    const dutchGrid = document.getElementById('dutchGrid');
 
-    // ✅ “추천 버튼 누르기 전에는 카드가 안 나오게” 플래그
     let hasRecommended = false;
 
     if (pStore) {
@@ -514,16 +565,32 @@
       storeWrap.style.display = 'block';
     }
 
-    // ✅ QR 카테고리 자동 선택은 유지(단, 자동 추천 렌더는 하지 않음)
     if (pCategory) {
       categorySelect.value = pCategory;
-      qrNotice.style.display = 'block';
-    } else {
-      qrNotice.style.display = 'none';
+    }
+
+    function renderDutch(){
+      const val = digitsOnly(amountInput.value);
+      const n = Number(val);
+      if (!val || n <= 0){
+        dutchWrap.style.display = 'none';
+        return;
+      }
+      dutchWrap.style.display = 'block';
+      dutchTotal.textContent = '총액 ' + n.toLocaleString('ko-KR') + '원';
+      dutchGrid.innerHTML = '';
+      for (let i = 2; i <= 5; i++){
+        const per = Math.floor(n / i);
+        const div = document.createElement('div');
+        div.className = 'dutch-item';
+        div.innerHTML = `<div class="n">${i}명</div><div class="amt">${per.toLocaleString('ko-KR')}원</div>`;
+        dutchGrid.appendChild(div);
+      }
     }
 
     amountInput.addEventListener('input', () => {
       amountInput.value = digitsOnly(amountInput.value);
+      renderDutch();
     });
 
     const dummyCards = [
@@ -575,23 +642,16 @@
       return card.rules.find(r => (r.category || []).includes(category)) || null;
     }
 
-    /* =========================
-       ✅ 추천 랭킹 로직: 변경 없음
-       ========================= */
     function computeScore(card, category, store){
       let score = 0;
-
       const rule = findRule(card, category);
       score += rule ? 55 : 15;
-
       const req = Number(card.requirements?.monthlySpendMin || 0);
       const spent = Number(card.user?.monthlySpent || 0);
       const met = (req === 0) ? true : (spent >= req);
       score += met ? 25 : -10;
-
       const affinity = inferIssuerAffinity(store);
       if (affinity && affinity === card.issuer) score += 12;
-
       score = Math.max(0, Math.min(100, score));
       return { score, met, rule, req, spent };
     }
@@ -607,54 +667,29 @@
       parts.push(item.rule ? `${category} 혜택 일치` : `${category} 혜택 약함`);
       if (item.req === 0) parts.push("전월실적 조건 없음");
       else parts.push(item.met ? "전월실적 충족" : "전월실적 미충족");
-
       const affinity = inferIssuerAffinity(store || "");
       if (affinity && affinity === item.card.issuer) parts.push("매장-카드사 추정 일치");
-
       return parts.slice(0, 3).join(" · ");
-    }
-
-    function showIdleResults(){
-      resultsEl.innerHTML = '<div class="muted-center">2초만에 잠자고 있던 내 카드 혜택을 찾아드려요!</div>';
-      resultSub.textContent = "";
-    }
-
-    function showLoadingResults(){
-      resultsEl.innerHTML = '<div class="muted-center">1초만 기다려주세요!</div>';
     }
 
     function renderResults(){
       const cat = categorySelect.value;
-      if (!cat) {
-        showIdleResults();
-        return;
-      }
-
+      if (!cat) return;
       const amountText = formatKRW(amountInput.value);
       const ctx = [cat];
       if (pFrom === "qr" || pCategory) ctx.push("QR 진입");
       if (amountText) ctx.push(amountText);
       resultSub.textContent = ctx.join(" · ");
-
       const ranked = dummyCards
         .map(card => ({ card, ...computeScore(card, cat, pStore || "") }))
         .sort((a,b) => b.score - a.score);
-
       resultsEl.innerHTML = "";
-
       ranked.forEach((item, idx) => {
         const { card, score, met, rule, req, spent } = item;
         const badge = badgeByScore(score);
-
-        const perfText = (req === 0)
-          ? "전월실적 조건 없음"
-          : (met
-              ? `전월실적 ${req.toLocaleString('ko-KR')}원 충족`
-              : `전월실적 미충족 (${Math.max(0, req - spent).toLocaleString('ko-KR')}원 부족)`);
-
+        const perfText = (req === 0) ? "전월실적 조건 없음" : (met ? `전월실적 ${req.toLocaleString()}원 충족` : `전월실적 미충족 (${Math.max(0, req - spent).toLocaleString()}원 부족)`);
         const benefitText = rule?.benefit || card.fallback;
         const whyText = (idx === 0) ? buildWhyText(item, cat, pStore || "") : "";
-
         const div = document.createElement('div');
         div.className = `rec-card pop ${idx === 0 ? "top" : ""}`;
         div.innerHTML = `
@@ -668,12 +703,6 @@
       });
     }
 
-    function refreshCTA(){
-      const hasCat = !!(categorySelect.value || "").trim();
-      const isLoading = btnRecommend.classList.contains("loading");
-      btnRecommend.disabled = !hasCat || isLoading;
-    }
-
     function setCTALoading(on){
       if (on){
         btnRecommend.classList.add("loading");
@@ -683,20 +712,18 @@
       } else {
         btnRecommend.classList.remove("loading");
         btnRecommend.textContent = btnRecommend.dataset.prevText || "카드 추천받기";
-        refreshCTA();
+        const hasCat = !!(categorySelect.value || "").trim();
+        btnRecommend.disabled = !hasCat;
       }
     }
 
     btnRecommend.addEventListener('click', () => {
-      refreshCTA();
-      if (btnRecommend.disabled) return;
-
+      if (!categorySelect.value) return;
       hasRecommended = true;
-
       setCTALoading(true);
-      showLoadingResults(); // ✅ 추천 중 “1초만 기다려주세요!”
+      resultsEl.innerHTML = '<div class="muted-center">1초만 기다려주세요!</div>';
       setTimeout(() => {
-        renderResults();     // ✅ 1초 후 카드가 “팝업”처럼 등장
+        renderResults();
         setCTALoading(false);
       }, 1000);
     });
@@ -705,26 +732,18 @@
       categorySelect.value = pCategory || "";
       amountInput.value = "";
       hasRecommended = false;
-
-      showIdleResults();
-      refreshCTA();
+      renderDutch();
+      resultsEl.innerHTML = '<div class="muted-center">업종을 선택하고 버튼을 눌러주십시오.</div>';
+      resultSub.textContent = "";
+      btnRecommend.disabled = !categorySelect.value;
     });
 
     categorySelect.addEventListener('change', () => {
-      refreshCTA();
-      // ✅ 업종 바꿔도 자동으로 카드가 나오지 않게(버튼 눌렀을 때만)
-      if (!hasRecommended) showIdleResults();
+      btnRecommend.disabled = !categorySelect.value;
+      if (!hasRecommended) resultsEl.innerHTML = '<div class="muted-center">업종을 선택하고 버튼을 눌러주십시오.</div>';
     });
 
-    // 초기 상태: QR 자동선택은 하되, 결과는 무조건 “추천 전” 상태로 유지
-    refreshCTA();
-    showIdleResults();
+    btnRecommend.disabled = !categorySelect.value;
   </script>
 </body>
 </html>
-
-
-
-
-
-
