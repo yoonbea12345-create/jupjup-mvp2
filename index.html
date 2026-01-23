@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>줍줍: 나만의 결제 비서</title>
+  <title>줍줍: 결제카드 추천 서비스</title>
   <meta name="description" content="결제 직전, 가장 유리한 결제수단을 추천하는 줍줍(JUPJUP)" />
 
   <!-- ✅ favicon: logo1 -->
@@ -355,7 +355,7 @@
     <div class="splash-content">
       <img src="/logo1.png" alt="줍줍 스플래시 로고" />
       <div class="splash-title">줍줍:</div>
-      <div class="splash-subtitle">나만의 결제 비서</div>
+      <div class="splash-subtitle">결제카드 추천 서비스</div>
     </div>
   </div>
 
@@ -363,7 +363,7 @@
     <div class="header-inner">
       <div class="brand" aria-label="줍줍 헤더">
         <img src="/logo1.png?v=20260123" alt="줍줍 로고" />
-        <div class="name">줍줍: 나만의 결제 비서</div>
+        <div class="name">줍줍: 결제카드 추천 서비스</div>
     </div>
   </header>
 
@@ -380,7 +380,7 @@
 
       <!-- category 파라미터가 있을 때 안내 -->
       <div id="qrNotice" class="notice" style="display:none;">
-        업종이 자동 선택되었습니다. 틀린 경우 아래에서 수정해 주세.
+        업종이 자동 선택되었습니다. 틀린 경우 아래에서 수정해 주세요.
       </div>
 
       <section class="panel" aria-label="결제 정보 입력">
@@ -388,9 +388,9 @@
 
         <div class="form-grid">
           <div>
-            <label for="categorySelect">업종 선택</label>
+            <label for="categorySelect">결제 장소</label>
             <select id="categorySelect">
-              <option value="">업종 선택</option>
+              <option value="">결제 장소</option>
               <option value="카페">카페/디저트</option>
               <option value="음식점">음식점/식당</option>
               <option value="편의점">편의점/마트</option>
@@ -401,12 +401,12 @@
           </div>
 
           <div>
-            <label for="amountInput">결제 금액 (예상)</label>
-            <input id="amountInput" type="text" inputmode="numeric" placeholder="예: 5400" />
+            <label for="amountInput">결제(예상) 금액</label>
+            <input id="amountInput" type="text" inputmode="numeric" placeholder="결제금액 혹은 예상금액을 입력해주세요." />
           </div>
         </div>
 
-        <button class="btn primary" id="btnRecommend">혜택 비교</button>
+        <button class="btn primary" id="btnRecommend">카드 추천받기</button>
         <button class="btn ghost" id="btnReset">다시 선택</button>
       </section>
 
@@ -630,4 +630,5 @@
   </script>
 </body>
 </html>
+
 
