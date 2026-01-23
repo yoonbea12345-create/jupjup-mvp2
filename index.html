@@ -14,7 +14,7 @@
       --muted: #475467;
       --line: #eaecf0;
 
-      /* 브랜드 컬러: 도파민 오렌지 조합 */
+      /* 브랜드 */
       --brand: #FF6B00;
       --brand-weak: #fff1e6;
       --brand-dark: #E66000;
@@ -29,7 +29,7 @@
       --bad: #b42318;
       --bad-bg: #fef3f2;
 
-      /* 스플래시 배경(과한 단색 방지: 그라데이션 + 하이라이트) */
+      /* Splash(과한 오렌지 단색 방지: 부드러운 그라데이션 + 하이라이트) */
       --splash-top: #FF7A1A;
       --splash-bottom: #FFB46A;
     }
@@ -72,7 +72,6 @@
       width: 150px;
       height: 150px;
       object-fit: contain;
-      /* logo1 자체에 배경이 포함된 이미지여도 경계가 덜 도드라지게 그림자를 부드럽게 */
       filter: drop-shadow(0 10px 20px rgba(0,0,0,0.14));
     }
 
@@ -85,7 +84,7 @@
       text-shadow: 0 10px 20px rgba(0,0,0,0.08);
     }
     .splash-subtitle {
-      font-weight: 700;
+      font-weight: 800;
       font-size: 14px;
       color: rgba(255,255,255,0.92);
       letter-spacing: -0.02em;
@@ -115,7 +114,7 @@
       gap: 8px;
       min-height: 28px;
     }
-    /* 헤더 로고(logo3) 안 보이는 케이스 방지: 표시/크기 강제 */
+    /* 헤더 로고는 logo3만 사용 + 표시/크기 강제 */
     .brand img {
       width: 28px !important;
       height: 28px !important;
@@ -127,19 +126,6 @@
       font-size: 18px;
       color: var(--brand);
       letter-spacing: -0.02em;
-      white-space: nowrap;
-    }
-
-    /* 로고 로드 실패 표시(원인 확인용) */
-    .logo-fail {
-      display: none;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--bad);
-      background: var(--bad-bg);
-      border: 1px solid rgba(180, 35, 24, 0.25);
-      padding: 6px 10px;
-      border-radius: 999px;
       white-space: nowrap;
     }
 
@@ -178,7 +164,7 @@
       padding: 12px 16px;
       color: var(--brand-dark);
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       border: 1px solid rgba(255, 107, 0, 0.15);
     }
 
@@ -192,7 +178,7 @@
     .panel h2 {
       margin: 0 0 16px;
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 900;
       color: var(--muted);
       letter-spacing: -0.01em;
     }
@@ -201,7 +187,7 @@
     label {
       display: block;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--muted);
       margin-bottom: 6px;
     }
@@ -225,7 +211,7 @@
       border: none;
       border-radius: 14px;
       padding: 16px;
-      font-weight: 800;
+      font-weight: 900;
       font-size: 16px;
       cursor: pointer;
       transition: 0.2s;
@@ -237,7 +223,7 @@
       color: var(--muted);
       padding: 10px 8px;
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
     /* ===== Result Cards ===== */
@@ -268,7 +254,7 @@
     .badge.bad { background: var(--bad-bg); color: var(--bad); }
 
     .rec-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.02em; }
-    .rec-meta { font-size: 13px; color: var(--muted); margin-bottom: 14px; font-weight: 700; }
+    .rec-meta { font-size: 13px; color: var(--muted); margin-bottom: 14px; font-weight: 800; }
 
     .benefit-highlight {
       background: var(--brand-weak);
@@ -299,17 +285,16 @@
       color: #98a2b3;
       margin-top: 12px;
       text-align: center;
-      font-weight: 700;
+      font-weight: 800;
       line-height: 1.5;
     }
 
-    /* 보조 텍스트 */
     .muted-center {
       text-align: center;
       padding: 40px 0;
       color: #98a2b3;
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 900;
     }
   </style>
 </head>
@@ -327,14 +312,11 @@
   <header>
     <div class="header-inner">
       <div class="brand" aria-label="줍줍 헤더">
-        <!-- 헤더 로고는 logo3만 사용 + 캐시 무효화 -->
-        <img id="headerLogo" src="./logo3.png?v=20260122" alt="줍줍 로고" />
+        <!-- 헤더 로고는 logo3만 사용 -->
+        <img src="/logo3.png?v=20260122" alt="줍줍 로고" />
         <div class="name">JUPJUP</div>
       </div>
-
-      <span id="logoFail" class="logo-fail">logo3 로드 실패</span>
-
-      <div style="font-size:12px; color:var(--muted); font-weight:800; white-space:nowrap;">
+      <div style="font-size:12px; color:var(--muted); font-weight:900; white-space:nowrap;">
         스마트 결제 비서
       </div>
     </div>
@@ -375,7 +357,6 @@
 
           <div>
             <label for="amountInput">결제 금액 (예상)</label>
-            <!-- type=number는 기기/브라우저마다 입력 깨짐이 있어 text + 숫자필터로 안정화 -->
             <input id="amountInput" type="text" inputmode="numeric" placeholder="예: 5400" />
           </div>
         </div>
@@ -403,9 +384,7 @@
   </main>
 
   <script>
-    /*********************
-     * Splash: 0.8~1초 후 페이드아웃
-     *********************/
+    // Splash
     window.addEventListener('load', () => {
       setTimeout(() => {
         const s = document.getElementById('splash');
@@ -414,29 +393,6 @@
       }, 900);
     });
 
-    /*********************
-     * 헤더 로고 로드 실패 감지(원인 확인용)
-     *********************/
-    (function headerLogoCheck(){
-      const img = document.getElementById('headerLogo');
-      const fail = document.getElementById('logoFail');
-
-      img.addEventListener('error', () => {
-        fail.style.display = 'inline-flex';
-        console.log('[JUPJUP] logo3 load failed:', img.currentSrc || img.src);
-      });
-
-      img.addEventListener('load', () => {
-        fail.style.display = 'none';
-      });
-    })();
-
-    /*********************
-     * URL Params
-     * category=카페|음식점|편의점|대중교통|온라인|기타
-     * from=qr
-     * store=스타벅스
-     *********************/
     const params = new URLSearchParams(window.location.search);
 
     function safeDecode(value){
@@ -451,50 +407,41 @@
       return map[s] || "";
     }
 
-    function digitsOnly(v){
-      return String(v || '').replace(/[^0-9]/g, '');
-    }
-
+    function digitsOnly(v){ return String(v || '').replace(/[^0-9]/g, ''); }
     function formatKRW(v){
       const n = Number(digitsOnly(v));
       if (!Number.isFinite(n) || n <= 0) return '';
       return n.toLocaleString('ko-KR') + '원';
     }
 
-    const pFrom = (params.get('from') || '').trim().toLowerCase();
     const pStore = safeDecode(params.get('store') || '').trim();
     const pCategory = normalizeCategory(safeDecode(params.get('category') || '').trim());
-
-    const categorySelect = document.getElementById('categorySelect');
-    const amountInput = document.getElementById('amountInput');
-    const resultsEl = document.getElementById('results');
-    const resultSub = document.getElementById('resultSub');
+    const pFrom = (params.get('from') || '').trim().toLowerCase();
 
     const storeWrap = document.getElementById('storeWrap');
     const storeName = document.getElementById('storeName');
     const qrNotice = document.getElementById('qrNotice');
 
-    if (pStore) {
+    const categorySelect = document.getElementById('categorySelect');
+    const amountInput = document.getElementById('amountInput');
+
+    const resultsEl = document.getElementById('results');
+    const resultSub = document.getElementById('resultSub');
+
+    if (pStore){
       storeName.textContent = pStore;
       storeWrap.style.display = 'block';
     }
 
-    if (pCategory) {
+    if (pCategory){
       categorySelect.value = pCategory;
       qrNotice.style.display = 'block';
-    } else {
-      qrNotice.style.display = 'none';
     }
 
-    // 금액 입력 안정화(붙여넣기/한글 등 들어와도 숫자만 유지)
     amountInput.addEventListener('input', () => {
-      const d = digitsOnly(amountInput.value);
-      amountInput.value = d;
+      amountInput.value = digitsOnly(amountInput.value);
     });
 
-    /*********************
-     * 더미 카드(구조화): 업종 매칭 + 실적 충족 여부 반영
-     *********************/
     const dummyCards = [
       {
         issuer: "신한",
@@ -512,7 +459,7 @@
         issuer: "국민",
         name: "KB 해피포인트(더미)",
         requirements: { monthlySpendMin: 400000 },
-        user: { monthlySpent: 260000 }, // 미충족
+        user: { monthlySpent: 260000 },
         rules: [
           { category:["편의점"], benefit:"편의점 8% 할인 (월 4천원)" },
           { category:["카페"], benefit:"카페 7% 할인 (월 6천원)" }
@@ -546,23 +493,19 @@
 
     function computeScore(card, category, store){
       let score = 0;
-
-      // 업종 혜택 일치
       const rule = findRule(card, category);
       score += rule ? 55 : 15;
 
-      // 실적 충족
       const req = Number(card.requirements?.monthlySpendMin || 0);
       const spent = Number(card.user?.monthlySpent || 0);
       const met = (req === 0) ? true : (spent >= req);
       score += met ? 25 : -10;
 
-      // 카드사 추정 일치(더미 가중치)
       const affinity = inferIssuerAffinity(store);
       if (affinity && affinity === card.issuer) score += 12;
 
       score = Math.max(0, Math.min(100, score));
-      return { score, met, rule, affinity, req, spent };
+      return { score, met, rule, req, spent };
     }
 
     function badgeByScore(score){
@@ -573,28 +516,23 @@
 
     function renderResults(){
       const cat = categorySelect.value;
-      if (!cat) {
+      if (!cat){
         resultsEl.innerHTML = '<div class="muted-center">업종을 선택하고 버튼을 눌러주십시오.</div>';
         resultSub.textContent = "";
         return;
       }
 
-      const store = pStore || "";
       const amountText = formatKRW(amountInput.value);
-
-      // 서브라인
-      const ctx = [];
-      ctx.push(cat);
+      const ctx = [cat];
       if (pFrom === "qr" || pCategory) ctx.push("QR 진입");
       if (amountText) ctx.push(amountText);
       resultSub.textContent = ctx.join(" · ");
 
       const ranked = dummyCards
-        .map(card => ({ card, ...computeScore(card, cat, store) }))
+        .map(card => ({ card, ...computeScore(card, cat, pStore || "") }))
         .sort((a,b) => b.score - a.score);
 
       resultsEl.innerHTML = "";
-
       ranked.forEach((item, idx) => {
         const { card, score, met, rule, req, spent } = item;
         const badge = badgeByScore(score);
@@ -613,11 +551,8 @@
           <div class="badge ${badge.cls}">${idx+1}순위 · ${badge.label} (${score}점)</div>
           <div class="rec-title">${card.name}</div>
           <div class="rec-meta">${card.issuer} · ${perfText}</div>
-          <div class="benefit-highlight">
-            <span style="font-weight:900;">혜택</span>
-            <span style="font-weight:900;">${benefitText}</span>
-          </div>
-          <img src="./logo3.png?v=20260122" class="wm" alt="" aria-hidden="true" />
+          <div class="benefit-highlight">💰 ${benefitText}</div>
+          <img src="/logo3.png?v=20260122" class="wm" alt="" aria-hidden="true" />
         `;
         resultsEl.appendChild(div);
       });
@@ -628,17 +563,14 @@
     document.getElementById('btnReset').addEventListener('click', () => {
       categorySelect.value = pCategory || "";
       amountInput.value = "";
-      if (pCategory) {
-        renderResults();
-      } else {
+      if (pCategory) renderResults();
+      else {
         resultsEl.innerHTML = '<div class="muted-center">업종을 선택하고 버튼을 눌러주십시오.</div>';
         resultSub.textContent = "";
       }
     });
 
-    // QR(category 존재)면 자동 렌더 (결제 직전 UX 고정)
     if (pCategory) renderResults();
   </script>
 </body>
 </html>
-
