@@ -75,18 +75,20 @@
       object-fit: contain;
       filter: drop-shadow(0 10px 20px rgba(0,0,0,0.14));
     }
+
+    /* ✅ 스플래시 문구: 헤더와 동일 컬러(var(--brand)) + 크기 업 */
     .splash-title {
       font-weight: 900;
-      font-size: 22px;
-      color: rgba(255,255,255,0.98);
+      font-size: 30px;           /* ← 기존 22px → 30px */
+      color: var(--brand);       /* ← 헤더와 동일 */
       letter-spacing: -0.04em;
       line-height: 1.05;
-      text-shadow: 0 10px 20px rgba(0,0,0,0.08);
+      text-shadow: 0 10px 20px rgba(0,0,0,0.06);
     }
     .splash-subtitle {
-      font-weight: 800;
-      font-size: 14px;
-      color: rgba(255,255,255,0.92);
+      font-weight: 900;
+      font-size: 18px;           /* ← 기존 14px → 18px */
+      color: var(--brand);       /* ← 헤더와 동일 */
       letter-spacing: -0.02em;
     }
 
@@ -102,7 +104,7 @@
     .header-inner {
       max-width: 600px;
       margin: 0 auto;
-      padding: 10px 16px; /* 헤더 높이 최소화 */
+      padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -236,7 +238,7 @@
       border: 2px solid var(--brand);
       background: linear-gradient(180deg, #fff 0%, #fff9f5 100%);
       box-shadow: 0 10px 20px rgba(255,107,0,0.10);
-      overflow: visible; /* ✅ 반짝 테두리(바깥) 잘리던 문제 방지 */
+      overflow: visible;
     }
 
     .badge {
@@ -344,7 +346,6 @@
       font-weight: 900;
     }
 
-    /* ✅ 워터마크 완전 제거(혹시 남아있어도 안 보이게) */
     .wm { display: none !important; }
   </style>
 </head>
@@ -364,12 +365,13 @@
       <div class="brand" aria-label="줍줍 헤더">
         <img src="/logo1.png?v=20260123" alt="줍줍 로고" />
         <div class="name">줍줍: 결제카드 추천 서비스</div>
+      </div>
+      <div class="header-right"></div>
     </div>
   </header>
 
   <main>
     <div class="stack">
-      <!-- store 파라미터 있을 때만 표시 -->
       <div id="storeWrap" style="display:none;">
         <div class="pill" title="매장명">
           <span class="dot" aria-hidden="true"></span>
@@ -378,7 +380,6 @@
         </div>
       </div>
 
-      <!-- category 파라미터가 있을 때 안내 -->
       <div id="qrNotice" class="notice" style="display:none;">
         결제장소와 금액을 입력 해주세요.
       </div>
@@ -422,7 +423,6 @@
   </main>
 
   <script>
-    // Splash: 0.8~1초 후 페이드아웃
     window.addEventListener('load', () => {
       setTimeout(() => {
         const s = document.getElementById('splash');
@@ -431,7 +431,6 @@
       }, 900);
     });
 
-    // URL Params
     const params = new URLSearchParams(window.location.search);
 
     function safeDecode(value){
@@ -485,7 +484,6 @@
       amountInput.value = digitsOnly(amountInput.value);
     });
 
-    // 더미 카드(랭킹/점수/실적/업종 매칭 기반)
     const dummyCards = [
       {
         issuer: "신한",
@@ -538,17 +536,14 @@
     function computeScore(card, category, store){
       let score = 0;
 
-      // 업종 혜택 일치
       const rule = findRule(card, category);
       score += rule ? 55 : 15;
 
-      // 실적 충족
       const req = Number(card.requirements?.monthlySpendMin || 0);
       const spent = Number(card.user?.monthlySpent || 0);
       const met = (req === 0) ? true : (spent >= req);
       score += met ? 25 : -10;
 
-      // 카드사 추정 일치(더미 가중치)
       const affinity = inferIssuerAffinity(store);
       if (affinity && affinity === card.issuer) score += 12;
 
@@ -618,12 +613,8 @@
       }
     });
 
-    // QR(category 존재)면 자동 렌더
     if (pCategory) renderResults();
   </script>
 </body>
 </html>
-
-
-
 
