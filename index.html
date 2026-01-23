@@ -336,9 +336,10 @@
       color: var(--muted);
       margin: 0 0 10px;
       display: flex;
-      align-items: flex-start;
-      gap: 6px;
+      align-items: center;
+      gap: 8px;
       line-height: 1.35;
+      flex-wrap: nowrap;
     }
     .why .chip {
       flex: 0 0 auto;
@@ -349,7 +350,16 @@
       border: 1px solid rgba(255,107,0,0.18);
       padding: 3px 8px;
       border-radius: 999px;
-      margin-top: 1px;
+      margin-top: 0;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+    .why .why-text{
+      flex: 1 1 auto;
+      min-width: 0;
+      display: block;
+      line-height: 1.35;
+      word-break: keep-all;
     }
 
     .benefit-highlight {
@@ -743,7 +753,7 @@
           <div class="badge ${badge.cls}">${idx+1}순위 · ${badge.label} (${score}점)</div>
           <div class="rec-title">${card.name}</div>
           <div class="rec-meta">${card.issuer} · ${perfText}</div>
-          ${idx === 0 ? `<div class="why"><span class="chip">WHY?</span><span>${whyText}</span></div>` : ``}
+          ${idx === 0 ? `<div class="why"><span class="chip">WHY?</span><span class="why-text">${whyText}</span></div>` : ``}
           <div class="benefit-highlight">💰 ${benefitText}</div>
         `;
         resultsEl.appendChild(div);
@@ -806,7 +816,3 @@
   </script>
 </body>
 </html>
-
-
-
-
