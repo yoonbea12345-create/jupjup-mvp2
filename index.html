@@ -378,29 +378,29 @@
 
     .wm { display: none !important; }
 
-    /* ✅ 더치페이 UI */
+    /* ✅ 더치페이 UI (추천카드 랭킹 안에서만 사용) */
     .dutch-box{
-      margin-top: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 107, 0, 0.18);
+      margin-top: 0;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 107, 0, 0.16);
       background: var(--brand-weak);
-      padding: 14px;
+      padding: 10px;
     }
     .dutch-head{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:10px;
-      margin-bottom: 10px;
+      gap:8px;
+      margin-bottom: 8px;
     }
     .dutch-title{
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 900;
       color: var(--brand-dark);
       letter-spacing: -0.01em;
     }
     .dutch-total{
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 900;
       color: rgba(230,96,0,0.92);
       white-space: nowrap;
@@ -408,32 +408,32 @@
     .dutch-grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
     .dutch-item{
-      background: rgba(255,255,255,0.80);
+      background: rgba(255,255,255,0.82);
       border: 1px solid rgba(255,255,255,0.92);
-      border-radius: 14px;
-      padding: 12px;
+      border-radius: 12px;
+      padding: 10px;
     }
     .dutch-item .n{
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 900;
       color: var(--muted);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
     .dutch-item .amt{
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 900;
       color: var(--text);
       letter-spacing: -0.02em;
     }
     .dutch-foot{
-      margin-top: 10px;
-      font-size: 12px;
+      margin-top: 8px;
+      font-size: 11px;
       font-weight: 800;
       color: rgba(71, 84, 103, 0.92);
-      line-height: 1.55;
+      line-height: 1.45;
     }
   </style>
 </head>
@@ -485,18 +485,6 @@
           <div>
             <label for="amountInput">결제(예상) 금액</label>
             <input id="amountInput" type="text" inputmode="numeric" placeholder="결제금액에 따라 최대 혜택이 달라질 수 있어요" />
-          </div>
-        </div>
-
-        <!-- ✅ 더치페이 2~5명 (입력창 바로 아래) -->
-        <div id="dutchWrap" style="display:none;">
-          <div class="dutch-box" aria-label="더치페이 계산">
-            <div class="dutch-head">
-              <div class="dutch-title">더치페이 계산</div>
-              <div class="dutch-total" id="dutchTotal">총액 -</div>
-            </div>
-            <div class="dutch-grid" id="dutchGrid"></div>
-            <div class="dutch-foot">※ 1인당 금액은 원 단위 내림 기준입니다.</div>
           </div>
         </div>
 
@@ -565,10 +553,6 @@
     const btnRecommend = document.getElementById('btnRecommend');
     const btnReset = document.getElementById('btnReset');
 
-    const dutchWrap = document.getElementById('dutchWrap');
-    const dutchTotal = document.getElementById('dutchTotal');
-    const dutchGrid = document.getElementById('dutchGrid');
-
     let hasRecommended = false;
 
     if (pStore) {
@@ -580,36 +564,6 @@
       categorySelect.value = pCategory;
     }
 
-    function renderDutch(){
-      const n = Number(digitsOnly(amountInput.value));
-      if (!Number.isFinite(n) || n <= 0){
-        dutchWrap.style.display = 'none';
-        dutchGrid.innerHTML = '';
-        dutchTotal.textContent = '총액 -';
-        return;
-      }
-
-      dutchWrap.style.display = 'block';
-      dutchTotal.textContent = '총액 ' + n.toLocaleString('ko-KR') + '원';
-      dutchGrid.innerHTML = '';
-
-      for (let people = 2; people <= 5; people++){
-        const per = Math.floor(n / people);
-        const remainder = n - (per * people);
-
-        const div = document.createElement('div');
-        div.className = 'dutch-item';
-        div.innerHTML = `
-          <div class="n">👥 ${people}명</div>
-          <div class="amt">${per.toLocaleString('ko-KR')}원</div>
-          <div style="margin-top:6px; font-size:12px; font-weight:800; color:rgba(71,84,103,0.9);">
-            남는 금액: ${remainder.toLocaleString('ko-KR')}원
-          </div>
-        `;
-        dutchGrid.appendChild(div);
-      }
-    }
-
     function buildDutchInline(n){
       if (!Number.isFinite(n) || n <= 0) return null;
 
@@ -617,7 +571,7 @@
       wrap.className = 'rec-card pop';
       wrap.innerHTML = `
         <div class="badge warn">더치페이 · 빠른 계산</div>
-        <div class="dutch-box" style="margin-top:0;">
+        <div class="dutch-box" aria-label="더치페이 계산">
           <div class="dutch-head">
             <div class="dutch-title">더치페이 계산</div>
             <div class="dutch-total">총액 ${n.toLocaleString('ko-KR')}원</div>
@@ -637,7 +591,7 @@
         div.innerHTML = `
           <div class="n">👥 ${people}명</div>
           <div class="amt">${per.toLocaleString('ko-KR')}원</div>
-          <div style="margin-top:6px; font-size:12px; font-weight:800; color:rgba(71,84,103,0.9);">
+          <div style="margin-top:5px; font-size:11px; font-weight:800; color:rgba(71,84,103,0.9);">
             남는 금액: ${remainder.toLocaleString('ko-KR')}원
           </div>
         `;
@@ -649,7 +603,6 @@
 
     amountInput.addEventListener('input', () => {
       amountInput.value = digitsOnly(amountInput.value);
-      renderDutch();
     });
 
     const dummyCards = [
@@ -701,6 +654,9 @@
       return card.rules.find(r => (r.category || []).includes(category)) || null;
     }
 
+    /* =========================
+       ✅ 추천 랭킹 로직: 변경 없음
+       ========================= */
     function computeScore(card, category, store){
       let score = 0;
 
@@ -836,7 +792,6 @@
       amountInput.value = "";
       hasRecommended = false;
 
-      renderDutch();
       showIdleResults();
       refreshCTA();
     });
@@ -848,7 +803,6 @@
 
     refreshCTA();
     showIdleResults();
-    renderDutch();
   </script>
 </body>
 </html>
