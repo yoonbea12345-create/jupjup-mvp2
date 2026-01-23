@@ -6,615 +6,141 @@
   <title>줍줍: 결제카드 추천 서비스</title>
   <meta name="description" content="결제 직전, 가장 유리한 결제수단을 추천하는 줍줍(JUPJUP)" />
 
-  <!-- ✅ favicon: logo1 -->
   <link rel="icon" href="/logo1.png?v=2" type="image/png" />
   <link rel="apple-touch-icon" href="/logo1.png?v=2" />
 
   <style>
     :root {
-      --bg: #f8f9fc;
-      --card: #ffffff;
-      --text: #101828;
-      --muted: #475467;
-      --line: #eaecf0;
+      --bg:#f8f9fc; --card:#fff; --text:#101828; --muted:#475467; --line:#eaecf0;
+      --brand:#FF6B00; --brand-weak:#fff1e6; --brand-dark:#E66000;
+      --shadow:0 12px 16px -4px rgba(16,24,40,.08); --radius:20px;
+      --ok:#027a48; --ok-bg:#ecfdf3; --warn:#b44d12; --warn-bg:#fffaeb;
+      --bad:#b42318; --bad-bg:#fef3f2;
+      --splash-top:#FF7A1A; --splash-bottom:#FFB46A;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--text)}
 
-      --brand: #FF6B00;
-      --brand-weak: #fff1e6;
-      --brand-dark: #E66000;
+    /* Splash */
+    .splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(180deg,var(--splash-top),var(--splash-bottom));z-index:9999}
+    .splash.fade-out{opacity:0;pointer-events:none;transition:.4s}
+    .splash-content{text-align:center}
+    .splash img{width:140px}
+    .splash-title{font-size:34px;font-weight:900;color:#fff}
+    .splash-subtitle{font-size:20px;font-weight:900;color:#fff}
 
-      --shadow: 0 12px 16px -4px rgba(16, 24, 40, 0.08);
-      --radius: 20px;
+    header{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--line)}
+    .header-inner{max-width:600px;margin:auto;padding:10px 16px;display:flex;align-items:center}
+    .brand{display:flex;gap:8px;align-items:center}
+    .brand img{width:26px}
+    .brand .name{font-weight:900;color:var(--brand)}
 
-      --ok: #027a48;
-      --ok-bg: #ecfdf3;
-      --warn: #b44d12;
-      --warn-bg: #fffaeb;
-      --bad: #b42318;
-      --bad-bg: #fef3f2;
+    main{max-width:600px;margin:auto;padding:20px 16px}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+    label{font-size:13px;font-weight:800;color:var(--muted)}
+    select,input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);margin-top:6px}
 
-      --splash-top: #FF7A1A;
-      --splash-bottom: #FFB46A;
-    }
+    .btn{width:100%;border-radius:14px;padding:16px;font-weight:900;font-size:16px;border:none}
+    .btn.primary{background:var(--brand);color:#fff;margin-top:10px}
+    .btn.primary:disabled{opacity:.6}
+    .btn.primary.loading::after{
+      content:"";width:16px;height:16px;border:2px solid rgba(255,255,255,.5);
+      border-top-color:#fff;border-radius:50%;position:absolute;right:16px;top:50%;
+      transform:translateY(-50%);animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:translateY(-50%) rotate(360deg)}}
+    .btn.ghost{background:none;color:var(--muted);font-size:14px}
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body {
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Noto Sans KR", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-
-    /* ===== Splash ===== */
-    .splash {
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(900px 520px at 50% 28%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 60%),
-        linear-gradient(180deg, var(--splash-top) 0%, var(--splash-bottom) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      opacity: 1;
-      transition: opacity 400ms ease;
-    }
-    .splash.fade-out { opacity: 0; pointer-events: none; }
-
-    .splash-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      text-align: center;
-      padding: 24px 18px;
-    }
-    .splash img {
-      width: 150px;
-      height: 150px;
-      object-fit: contain;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.14));
-    }
-
-    /* ✅ 스플래시 문구: 헤더와 동일 컬러(var(--brand)) + 크기 업 */
-    .splash-title {
-      font-weight: 900;
-      font-size: 35px;         
-      color: rgba(255,255,255,0.98);       
-      letter-spacing: -0.04em;
-      line-height: 1.05;
-      text-shadow: 0 10px 20px rgba(0,0,0,0.06);
-    }
-    .splash-subtitle {
-      font-weight: 900;
-      font-size: 21px;           
-      color: rgba(255,255,255,0.92);      
-      letter-spacing: -0.02em;
-    }
-
-    /* ===== Header ===== */
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--line);
-    }
-    .header-inner {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 28px;
-    }
-    .brand img {
-      width: 26px !important;
-      height: 26px !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
-    .brand .name {
-      font-weight: 900;
-      font-size: 16px;
-      color: var(--brand);
-      letter-spacing: -0.02em;
-      white-space: nowrap;
-    }
-    .header-right {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    main {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px 16px;
-    }
-    .stack { display: flex; flex-direction: column; gap: 16px; }
-
-    /* ===== UI Elements ===== */
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      background: white;
-      border: 1px solid var(--line);
-      font-size: 14px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-      max-width: 100%;
-    }
-    .pill .dot { width: 8px; height: 8px; background: var(--brand); border-radius: 50%; }
-    .pill strong { white-space: nowrap; }
-    .pill span {
-      color: var(--muted);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .notice {
-      background: var(--brand-weak);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: var(--brand-dark);
-      font-size: 13px;
-      font-weight: 800;
-      border: 1px solid rgba(255, 107, 0, 0.15);
-    }
-
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 20px;
-    }
-    .panel h2 {
-      margin: 0 0 16px;
-      font-size: 15px;
-      font-weight: 900;
-      color: var(--muted);
-      letter-spacing: -0.01em;
-    }
-
-    .form-grid { display: flex; flex-direction: column; gap: 16px; }
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    select, input {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #fff;
-      font-size: 15px;
-      outline: none;
-      transition: all 0.2s;
-    }
-    select:focus, input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-weak); }
-
-    .btn {
-      width: 100%;
-      border: none;
-      border-radius: 14px;
-      padding: 16px;
-      font-weight: 900;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .btn.primary { background: var(--brand); color: white; margin-top: 8px; }
-    .btn.primary:active { background: var(--brand-dark); transform: scale(0.98); }
-    .btn.ghost { background: transparent; color: var(--muted); padding: 10px 8px; font-size: 14px; font-weight: 900; }
-
-    /* ===== Result Cards ===== */
-    .rec-card {
-      position: relative;
-      border-radius: var(--radius);
-      background: white;
-      border: 1px solid var(--line);
-      padding: 20px;
-      margin-bottom: 12px;
-      overflow: hidden;
-    }
-    .rec-card.top {
-      border: 2px solid var(--brand);
-      background: linear-gradient(180deg, #fff 0%, #fff9f5 100%);
-      box-shadow: 0 10px 20px rgba(255,107,0,0.10);
-      overflow: visible;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 900;
-      margin-bottom: 12px;
-    }
-    .badge.ok { background: var(--ok-bg); color: var(--ok); }
-    .badge.warn { background: var(--warn-bg); color: var(--warn); }
-    .badge.bad { background: var(--bad-bg); color: var(--bad); }
-
-    .rec-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.02em; }
-    .rec-meta { font-size: 13px; color: var(--muted); margin-bottom: 14px; font-weight: 800; }
-
-    /* ===== 1순위 카드: 오렌지 보더 + 반짝(샤인) 효과 ===== */
-    .rec-card.top::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      border-radius: calc(var(--radius) + 2px);
-      background: linear-gradient(
-        110deg,
-        rgba(255,107,0,0.25) 0%,
-        rgba(255,107,0,0.95) 20%,
-        rgba(255,255,255,0.85) 35%,
-        rgba(255,107,0,0.95) 50%,
-        rgba(255,107,0,0.25) 100%
-      );
-      background-size: 220% 220%;
-      animation: jupupBorderShine 2.6s linear infinite;
-      z-index: 0;
-
-      -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-
-      padding: 2px;
-      pointer-events:none;
-    }
-
-    .rec-card.top::after{
-      content:"";
-      position:absolute;
-      inset:-10px;
-      border-radius: calc(var(--radius) + 10px);
-      background: radial-gradient(
-        60% 60% at 50% 30%,
-        rgba(255,107,0,0.22) 0%,
-        rgba(255,107,0,0.05) 55%,
-        rgba(255,107,0,0) 75%
-      );
-      filter: blur(6px);
-      opacity: .9;
-      z-index: 0;
-      pointer-events:none;
-    }
-
-    .rec-card.top > *{
-      position: relative;
-      z-index: 1;
-    }
-
-    @keyframes jupupBorderShine{
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      .rec-card.top::before{ animation: none; }
-    }
-
-    .benefit-highlight {
-      background: var(--brand-weak);
-      color: var(--brand-dark);
-      padding: 12px 12px;
-      border-radius: 12px;
-      font-weight: 900;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid rgba(255, 107, 0, 0.18);
-    }
-
-    .footnote {
-      font-size: 12px;
-      color: #98a2b3;
-      margin-top: 12px;
-      text-align: center;
-      font-weight: 800;
-      line-height: 1.5;
-    }
-
-    .muted-center {
-      text-align: center;
-      padding: 40px 0;
-      color: #98a2b3;
-      font-size: 14px;
-      font-weight: 900;
-    }
-
-    .wm { display: none !important; }
+    .rec-card{border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:12px}
+    .rec-card.top{border:2px solid var(--brand);background:#fff9f5}
+    .badge{font-size:11px;font-weight:900;padding:4px 10px;border-radius:8px;display:inline-block}
+    .badge.ok{background:var(--ok-bg);color:var(--ok)}
+    .badge.warn{background:var(--warn-bg);color:var(--warn)}
+    .badge.bad{background:var(--bad-bg);color:var(--bad)}
+    .rec-title{font-size:18px;font-weight:900;margin:6px 0}
+    .rec-meta{font-size:13px;color:var(--muted);font-weight:800}
+    .why{font-size:12px;font-weight:900;color:var(--muted);margin:8px 0}
+    .benefit-highlight{background:var(--brand-weak);color:var(--brand-dark);
+      padding:12px;border-radius:12px;font-weight:900}
   </style>
 </head>
 
 <body>
-  <!-- Splash -->
-  <div class="splash" id="splash" aria-hidden="true">
-    <div class="splash-content">
-      <img src="/logo1.png" alt="줍줍 스플래시 로고" />
-      <div class="splash-title">줍줍:</div>
-      <div class="splash-subtitle">결제카드 추천 서비스</div>
+<div class="splash" id="splash">
+  <div class="splash-content">
+    <img src="/logo1.png">
+    <div class="splash-title">줍줍:</div>
+    <div class="splash-subtitle">결제카드 추천 서비스</div>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <img src="/logo1.png">
+      <div class="name">줍줍: 결제카드 추천 서비스</div>
     </div>
   </div>
+</header>
 
-  <header>
-    <div class="header-inner">
-      <div class="brand" aria-label="줍줍 헤더">
-        <img src="/logo1.png?v=20260123" alt="줍줍 로고" />
-        <div class="name">줍줍: 결제카드 추천 서비스</div>
-      </div>
-      <div class="header-right"></div>
+<main>
+  <section class="panel">
+    <label>결제 장소</label>
+    <select id="category">
+      <option value="">선택</option>
+      <option value="카페">카페</option>
+      <option value="음식점">음식점</option>
+      <option value="편의점">편의점</option>
+    </select>
+
+    <label style="margin-top:14px">결제 금액</label>
+    <input id="amount" inputmode="numeric" placeholder="금액 입력">
+
+    <button class="btn primary" id="recommend">카드 추천받기</button>
+    <button class="btn ghost" id="reset">다시 선택</button>
+  </section>
+
+  <section class="panel">
+    <h3>추천 카드 랭킹</h3>
+    <div id="results">
+      <div style="text-align:center;color:#98a2b3;font-weight:900">업종을 선택하고 버튼을 눌러주십시오.</div>
     </div>
-  </header>
+  </section>
+</main>
 
-  <main>
-    <div class="stack">
-      <div id="storeWrap" style="display:none;">
-        <div class="pill" title="매장명">
-          <span class="dot" aria-hidden="true"></span>
-          <strong id="storeName">-</strong>
-          <span>에서 결제 중</span>
-        </div>
-      </div>
+<script>
+window.onload=()=>setTimeout(()=>document.getElementById('splash').classList.add('fade-out'),900);
 
-      <div id="qrNotice" class="notice" style="display:none;">
-        결제장소와 금액을 입력 해주세요.
-      </div>
+const btn=document.getElementById('recommend');
+const cat=document.getElementById('category');
+const res=document.getElementById('results');
 
-      <section class="panel" aria-label="결제 정보 입력">
-        <div class="form-grid">
-          <div>
-            <label for="categorySelect">결제 장소</label>
-            <select id="categorySelect">
-              <option value="">결제 장소</option>
-              <option value="카페">카페/디저트</option>
-              <option value="음식점">음식점/식당</option>
-              <option value="편의점">편의점/마트</option>
-              <option value="대중교통">대중교통</option>
-              <option value="온라인">온라인 쇼핑</option>
-              <option value="기타">기타</option>
-            </select>
-          </div>
+const cards=[
+ {name:"신한 Deep Dream",score:80,why:"카페 혜택 + 전월실적 충족",benefit:"카페 10% 적립"},
+ {name:"KB 해피포인트",score:45,why:"카페 혜택 있음",benefit:"카페 7% 할인"},
+ {name:"현대 ZERO",score:40,why:"기본 할인 카드",benefit:"전가맹점 1%"}
+];
 
-          <div>
-            <label for="amountInput">결제(예상) 금액</label>
-            <input id="amountInput" type="text" inputmode="numeric" placeholder="결제금액에 따라 최대 혜택이 달라질 수 있어요" />
-          </div>
-        </div>
-
-        <button class="btn primary" id="btnRecommend">카드 추천받기</button>
-        <button class="btn ghost" id="btnReset">다시 선택</button>
-      </section>
-
-      <section class="panel" aria-label="추천 결과">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px;">
-          <h2 style="margin:0;">추천 카드 랭킹</h2>
-          <span id="resultSub" style="font-size:12px; color:var(--brand); font-weight:900; white-space:nowrap;"></span>
-        </div>
-
-        <div id="results">
-          <div class="muted-center">업종을 선택하고 버튼을 눌러주십시오.</div>
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <script>
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const s = document.getElementById('splash');
-        s.classList.add('fade-out');
-        setTimeout(() => s.style.display = 'none', 420);
-      }, 900);
-    });
-
-    const params = new URLSearchParams(window.location.search);
-
-    function safeDecode(value){
-      try { return decodeURIComponent(value || ''); } catch(e){ return value || ''; }
-    }
-
-    function normalizeCategory(v){
-      const s = (v || '').trim();
-      const allowed = ["카페","음식점","편의점","대중교통","온라인","기타"];
-      if (allowed.includes(s)) return s;
-      const map = { "카페/디저트":"카페", "식당":"음식점", "레스토랑":"음식점" };
-      return map[s] || "";
-    }
-
-    function digitsOnly(v){
-      return String(v || '').replace(/[^0-9]/g, '');
-    }
-
-    function formatKRW(v){
-      const n = Number(digitsOnly(v));
-      if (!Number.isFinite(n) || n <= 0) return '';
-      return n.toLocaleString('ko-KR') + '원';
-    }
-
-    const pFrom = (params.get('from') || '').trim().toLowerCase();
-    const pStore = safeDecode(params.get('store') || '').trim();
-    const pCategory = normalizeCategory(safeDecode(params.get('category') || '').trim());
-
-    const categorySelect = document.getElementById('categorySelect');
-    const amountInput = document.getElementById('amountInput');
-    const resultsEl = document.getElementById('results');
-    const resultSub = document.getElementById('resultSub');
-
-    const storeWrap = document.getElementById('storeWrap');
-    const storeName = document.getElementById('storeName');
-    const qrNotice = document.getElementById('qrNotice');
-
-    if (pStore) {
-      storeName.textContent = pStore;
-      storeWrap.style.display = 'block';
-    }
-
-    if (pCategory) {
-      categorySelect.value = pCategory;
-      qrNotice.style.display = 'block';
-    } else {
-      qrNotice.style.display = 'none';
-    }
-
-    amountInput.addEventListener('input', () => {
-      amountInput.value = digitsOnly(amountInput.value);
-    });
-
-    const dummyCards = [
-      {
-        issuer: "신한",
-        name: "신한 Deep Dream(더미)",
-        requirements: { monthlySpendMin: 300000 },
-        user: { monthlySpent: 420000 },
-        rules: [
-          { category:["카페"], benefit:"카페 10% 적립 (월 5천원)" },
-          { category:["음식점"], benefit:"음식점 5% 적립 (월 7천원)" },
-          { category:["편의점"], benefit:"편의점 2% 적립 (월 3천원)" }
-        ],
-        fallback: "기본 혜택 없음(더미)"
-      },
-      {
-        issuer: "국민",
-        name: "KB 해피포인트(더미)",
-        requirements: { monthlySpendMin: 400000 },
-        user: { monthlySpent: 260000 },
-        rules: [
-          { category:["편의점"], benefit:"편의점 8% 할인 (월 4천원)" },
-          { category:["카페"], benefit:"카페 7% 할인 (월 6천원)" }
-        ],
-        fallback: "기본 혜택 없음(더미)"
-      },
-      {
-        issuer: "현대",
-        name: "현대 ZERO(더미)",
-        requirements: { monthlySpendMin: 0 },
-        user: { monthlySpent: 0 },
-        rules: [
-          { category:["온라인"], benefit:"온라인 2% 할인 (월 8천원)" },
-          { category:["기타"], benefit:"전가맹점 1% 할인(가정)" }
-        ],
-        fallback: "전가맹점 1% 할인(가정)"
-      }
-    ];
-
-    function inferIssuerAffinity(store){
-      const s = (store || "").toLowerCase();
-      if (s.includes("스타벅스") || s.includes("starbucks")) return "신한";
-      if (s.includes("gs") || s.includes("gs25")) return "국민";
-      if (s.includes("cu")) return "현대";
-      return "";
-    }
-
-    function findRule(card, category){
-      return card.rules.find(r => (r.category || []).includes(category)) || null;
-    }
-
-    function computeScore(card, category, store){
-      let score = 0;
-
-      const rule = findRule(card, category);
-      score += rule ? 55 : 15;
-
-      const req = Number(card.requirements?.monthlySpendMin || 0);
-      const spent = Number(card.user?.monthlySpent || 0);
-      const met = (req === 0) ? true : (spent >= req);
-      score += met ? 25 : -10;
-
-      const affinity = inferIssuerAffinity(store);
-      if (affinity && affinity === card.issuer) score += 12;
-
-      score = Math.max(0, Math.min(100, score));
-      return { score, met, rule, req, spent };
-    }
-
-    function badgeByScore(score){
-      if (score >= 80) return { cls:"ok", label:"최적 혜택" };
-      if (score >= 60) return { cls:"warn", label:"추천" };
-      return { cls:"bad", label:"비추천" };
-    }
-
-    function renderResults(){
-      const cat = categorySelect.value;
-      if (!cat) {
-        resultsEl.innerHTML = '<div class="muted-center">업종을 선택하고 버튼을 눌러주십시오.</div>';
-        resultSub.textContent = "";
-        return;
-      }
-
-      const amountText = formatKRW(amountInput.value);
-      const ctx = [cat];
-      if (pFrom === "qr" || pCategory) ctx.push("QR 진입");
-      if (amountText) ctx.push(amountText);
-      resultSub.textContent = ctx.join(" · ");
-
-      const ranked = dummyCards
-        .map(card => ({ card, ...computeScore(card, cat, pStore || "") }))
-        .sort((a,b) => b.score - a.score);
-
-      resultsEl.innerHTML = "";
-
-      ranked.forEach((item, idx) => {
-        const { card, score, met, rule, req, spent } = item;
-        const badge = badgeByScore(score);
-
-        const perfText = (req === 0)
-          ? "전월실적 조건 없음"
-          : (met
-              ? `전월실적 ${req.toLocaleString('ko-KR')}원 충족`
-              : `전월실적 미충족 (${Math.max(0, req - spent).toLocaleString('ko-KR')}원 부족)`);
-
-        const benefitText = rule?.benefit || card.fallback;
-
-        const div = document.createElement('div');
-        div.className = `rec-card ${idx === 0 ? "top" : ""}`;
-        div.innerHTML = `
-          <div class="badge ${badge.cls}">${idx+1}순위 · ${badge.label} (${score}점)</div>
-          <div class="rec-title">${card.name}</div>
-          <div class="rec-meta">${card.issuer} · ${perfText}</div>
-          <div class="benefit-highlight">💰 ${benefitText}</div>
-        `;
-        resultsEl.appendChild(div);
-      });
-    }
-
-    document.getElementById('btnRecommend').addEventListener('click', renderResults);
-
-    document.getElementById('btnReset').addEventListener('click', () => {
-      categorySelect.value = pCategory || "";
-      amountInput.value = "";
-      if (pCategory) renderResults();
-      else {
-        resultsEl.innerHTML = '<div class="muted-center">업종을 선택하고 버튼을 눌러주십시오.</div>';
-        resultSub.textContent = "";
-      }
-    });
-
-    if (pCategory) renderResults();
-  </script>
+btn.onclick=()=>{
+ if(!cat.value)return;
+ btn.classList.add('loading'); btn.textContent="혜택 계산 중…";
+ setTimeout(()=>{
+  res.innerHTML="";
+  cards.forEach((c,i)=>{
+    res.innerHTML+=`
+      <div class="rec-card ${i==0?"top":""}">
+        <div class="badge ${i==0?"ok":"warn"}">${i+1}순위</div>
+        <div class="rec-title">${c.name}</div>
+        ${i==0?`<div class="why">왜 1순위? ${c.why}</div>`:""}
+        <div class="benefit-highlight">💰 ${c.benefit}</div>
+      </div>`;
+  });
+  btn.classList.remove('loading'); btn.textContent="카드 추천받기";
+ },400);
+};
+</script>
 </body>
 </html>
 
