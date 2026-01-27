@@ -375,13 +375,38 @@
       border: 1px solid rgba(255, 107, 0, 0.18);
       flex-wrap: wrap;
     }
+
+    /* ✅ AI예상 페이백: 더 굵게/진하게/한눈에 */
     .ai-payback{
       width: 100%;
-      margin-top: 6px;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 107, 0, 0.35);
+      background: rgba(255, 255, 255, 0.78);
+
+      font-size: 14px;
+      font-weight: 1000;
+      letter-spacing: -0.02em;
+
+      color: #7A2E00;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .ai-payback .label{
       font-size: 12px;
-      font-weight: 900;
-      color: rgba(71, 84, 103, 0.92);
-      letter-spacing: -0.01em;
+      font-weight: 1000;
+      color: rgba(122, 46, 0, 0.92);
+      white-space: nowrap;
+    }
+    .ai-payback .value{
+      font-size: 18px;
+      font-weight: 1000;
+      color: var(--brand-dark);
+      letter-spacing: -0.03em;
+      white-space: nowrap;
     }
 
     .muted-center {
@@ -903,7 +928,12 @@
         const whyText = (idx === 0) ? buildWhyText(item, cat, pStore || "") : "";
 
         const pay = estimatePayback(Number(digitsOnly(amountInput.value)), benefitText);
-        const payHtml = (pay === null) ? "" : `<div class="ai-payback">AI예상 페이백금액: ${pay.toLocaleString('ko-KR')}원</div>`;
+        const payHtml = (pay === null) ? "" : `
+          <div class="ai-payback">
+            <span class="label">AI예상 페이백금액</span>
+            <span class="value">${pay.toLocaleString('ko-KR')}원</span>
+          </div>
+        `;
 
         const div = document.createElement('div');
         div.className = `rec-card pop ${idx === 0 ? "top" : ""}`;
