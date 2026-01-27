@@ -373,6 +373,15 @@
       align-items: center;
       gap: 8px;
       border: 1px solid rgba(255, 107, 0, 0.18);
+      flex-wrap: wrap;
+    }
+    .ai-payback{
+      width: 100%;
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(71, 84, 103, 0.92);
+      letter-spacing: -0.01em;
     }
 
     .muted-center {
@@ -548,6 +557,23 @@
       return n.toLocaleString('ko-KR') + '원';
     }
 
+    function parsePercentFromText(text){
+      const t = String(text || '');
+      const m = t.match(/([0-9]+(?:\.[0-9]+)?)\s*%/);
+      if (!m) return null;
+      const p = Number(m[1]);
+      if (!Number.isFinite(p) || p <= 0) return null;
+      return p;
+    }
+
+    function estimatePayback(amount, benefitText){
+      const a = Number(amount);
+      if (!Number.isFinite(a) || a <= 0) return null;
+      const pct = parsePercentFromText(benefitText);
+      const rate = (pct === null) ? 0.7 : pct;
+      return Math.floor(a * rate / 100);
+    }
+
     const pFrom = (params.get('from') || '').trim().toLowerCase();
     const pStore = safeDecode(params.get('store') || '').trim();
     const pCategory = normalizeCategory(safeDecode(params.get('category') || '').trim());
@@ -622,6 +648,7 @@
         name: "신한카드 Deep Dream",
         requirements: { monthlySpendMin: 0 },
         user: { monthlySpent: 0 },
+        source: { issuerSite: "신한카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["카페"], benefit:"기본 0.7% 적립 + (선택영역) 카페 등 추가 적립(대표)" },
           { category:["온라인"], benefit:"기본 0.7% 적립 + (선택영역) 온라인 등 추가 적립(대표)" },
@@ -634,6 +661,7 @@
         name: "신한카드 Mr.Life",
         requirements: { monthlySpendMin: 300000 },
         user: { monthlySpent: 420000 },
+        source: { issuerSite: "신한카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["편의점"], benefit:"편의점 10% 할인(대표) · 시간/횟수/한도 조건 있음" },
           { category:["온라인"], benefit:"온라인 쇼핑 10% 할인(대표) · 시간/한도 조건 있음" },
@@ -646,6 +674,7 @@
         name: "신한카드 처음",
         requirements: { monthlySpendMin: 300000 },
         user: { monthlySpent: 260000 },
+        source: { issuerSite: "신한카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["음식점"], benefit:"음식점 5% 적립(대표) · 월 한도/조건 있음" },
           { category:["카페"], benefit:"커피전문점 5% 적립(대표) · 월 한도/조건 있음" },
@@ -661,6 +690,7 @@
         name: "KB국민 탄탄대로 웰컴카드",
         requirements: { monthlySpendMin: 300000 },
         user: { monthlySpent: 320000 },
+        source: { issuerSite: "KB국민카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["편의점"], benefit:"편의점 5% 청구할인(대표) · 전월실적/한도 조건 있음" },
           { category:["대중교통"], benefit:"대중교통·택시 5% 청구할인(대표) · 전월실적/한도 조건 있음" },
@@ -673,6 +703,7 @@
         name: "KB국민 청춘대로 톡톡카드",
         requirements: { monthlySpendMin: 300000 },
         user: { monthlySpent: 350000 },
+        source: { issuerSite: "KB국민카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["카페"], benefit:"카페/베이커리 10% 할인(대표) · 조건/한도 있음" },
           { category:["대중교통"], benefit:"대중교통·택시 10% 할인(대표) · 조건/한도 있음" }
@@ -684,6 +715,7 @@
         name: "KB국민 탄탄대로 올쇼핑카드",
         requirements: { monthlySpendMin: 300000 },
         user: { monthlySpent: 260000 },
+        source: { issuerSite: "KB국민카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["온라인"], benefit:"쇼핑 영역 청구할인(대표) · 조건/한도 있음" },
           { category:["편의점"], benefit:"편의점 5% 청구할인(대표) · 조건/한도 있음" },
@@ -698,6 +730,7 @@
         name: "우리카드 카드의정석 TEN",
         requirements: { monthlySpendMin: 400000 },
         user: { monthlySpent: 420000 },
+        source: { issuerSite: "우리카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["카페"], benefit:"커피 10% 청구할인(TEN Discount) · 조건/한도 있음" },
           { category:["편의점"], benefit:"편의점 10% 청구할인(TEN Discount) · 조건/한도 있음" },
@@ -711,6 +744,7 @@
         name: "우리카드 카드의정석 POINT",
         requirements: { monthlySpendMin: 0 },
         user: { monthlySpent: 0 },
+        source: { issuerSite: "우리카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["기타"], benefit:"기본 적립(대표) · 적립한도 없이 기본 가맹점 포인트 적립" },
           { category:["카페"], benefit:"특별 업종 포인트 적립(대표) · 최대 5% 수준(조건/한도 있음)" },
@@ -723,6 +757,7 @@
         name: "우리카드 카드의정석 시즌2",
         requirements: { monthlySpendMin: 0 },
         user: { monthlySpent: 0 },
+        source: { issuerSite: "우리카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["기타"], benefit:"국내외 가맹점 1.2% 청구할인(대표)" },
           { category:["온라인"], benefit:"국내외 가맹점 1.2% 청구할인(대표)" }
@@ -736,6 +771,7 @@
         name: "NH농협 올바른 FLEX 카드",
         requirements: { monthlySpendMin: 300000 },
         user: { monthlySpent: 280000 },
+        source: { issuerSite: "NH농협카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["카페"], benefit:"스타벅스 50% 청구할인(대표) · 조건/한도 있음" },
           { category:["온라인"], benefit:"생활/구독 영역 청구할인(대표) · 조건/한도 있음" }
@@ -747,6 +783,7 @@
         name: "NH농협 올바른 MYPICK 카드",
         requirements: { monthlySpendMin: 400000 },
         user: { monthlySpent: 420000 },
+        source: { issuerSite: "NH농협카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["카페"], benefit:"커피(스타벅스 포함) 5% 청구할인(대표) · 통합 한도 있음" },
           { category:["대중교통"], benefit:"대중교통/택시 5% 청구할인(대표) · 통합 한도 있음" },
@@ -759,6 +796,7 @@
         name: "NH농협 올바른 MYPICK 카드(푸드/편의점)",
         requirements: { monthlySpendMin: 400000 },
         user: { monthlySpent: 260000 },
+        source: { issuerSite: "NH농협카드", note: "공식 혜택 방향을 MVP용으로 요약한 문구입니다." },
         rules: [
           { category:["음식점"], benefit:"음식점 5% 청구할인(대표) · 조건/한도 있음" },
           { category:["편의점"], benefit:"편의점 5% 청구할인(대표) · 조건/한도 있음" }
@@ -840,8 +878,10 @@
       if (amountText) ctx.push(amountText);
       resultSub.textContent = ctx.join(" · ");
 
+      const storeForScore = (pStore || "스타벅스");
+
       const ranked = dummyCards
-        .map(card => ({ card, ...computeScore(card, cat, pStore || "") }))
+        .map(card => ({ card, ...computeScore(card, cat, storeForScore) }))
         .sort((a,b) => b.score - a.score);
 
       resultsEl.innerHTML = "";
@@ -862,6 +902,9 @@
         const benefitText = rule?.benefit || card.fallback;
         const whyText = (idx === 0) ? buildWhyText(item, cat, pStore || "") : "";
 
+        const pay = estimatePayback(Number(digitsOnly(amountInput.value)), benefitText);
+        const payHtml = (pay === null) ? "" : `<div class="ai-payback">AI예상 페이백금액: ${pay.toLocaleString('ko-KR')}원</div>`;
+
         const div = document.createElement('div');
         div.className = `rec-card pop ${idx === 0 ? "top" : ""}`;
         div.innerHTML = `
@@ -869,7 +912,7 @@
           <div class="rec-title">${card.name}</div>
           <div class="rec-meta">${card.issuer} · ${perfText}</div>
           ${idx === 0 ? `<div class="why"><span class="chip">WHY?</span><span class="why-text">${whyText}</span></div>` : ``}
-          <div class="benefit-highlight">💰 ${benefitText}</div>
+          <div class="benefit-highlight">💰 ${benefitText}${payHtml}</div>
         `;
         resultsEl.appendChild(div);
 
