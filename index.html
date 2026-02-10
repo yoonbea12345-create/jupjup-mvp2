@@ -188,7 +188,7 @@
       letter-spacing: -0.01em;
     }
 
-    .form-grid { display: flex; flex-direction: column; gap: 16px; }
+    .form-grid { display: flex; flex-direction: column; gap: 14px; }
     label {
       display: block;
       font-size: 13px;
@@ -196,15 +196,18 @@
       color: var(--muted);
       margin-bottom: 6px;
     }
+
+    /* ✅ 입력 바(결제 장소/금액) 얇게 */
     select, input {
       width: 100%;
-      padding: 14px;
-      border-radius: 12px;
+      padding: 10px 12px;         /* 기존 14px → 10px 12px */
+      border-radius: 10px;        /* 기존 12px → 10px */
       border: 1px solid var(--line);
       background: #fff;
-      font-size: 15px;
+      font-size: 14px;            /* 기존 15px → 14px */
       outline: none;
       transition: all 0.2s;
+      line-height: 1.2;
     }
     select:focus, input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-weak); }
 
@@ -794,9 +797,6 @@
       return card.rules.find(r => (r.category || []).includes(category)) || null;
     }
 
-    /* =========================
-       ✅ 페이백 계산 로직 (보수적 고신뢰 모델)
-       ========================= */
     function computePayback(card, category, amount, store){
       const n = Number(amount);
       if (!Number.isFinite(n) || n <= 0) {
@@ -896,9 +896,6 @@
       return { payback: 0, rate: 0, note: "※ 현재 카드의 대표 혜택 적용 조건이 불확실하여 0원으로 계산했습니다." };
     }
 
-    /* =========================
-       ✅ 추천 랭킹 로직: 변경 없음
-       ========================= */
     function computeScore(card, category, store){
       let score = 0;
 
@@ -946,7 +943,6 @@
       hideScrollCTA();
     }
 
-    /* ✅ 스크롤 유도 CTA 동작 */
     function hideScrollCTA(){
       scrollCta.style.display = "none";
       mainEl.classList.remove("pad-bottom");
