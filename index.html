@@ -664,7 +664,7 @@
   <!-- ✅ 스크롤 유도 CTA -->
   <div class="scroll-cta" id="scrollCta" aria-label="다음 카드 보기">
     <div class="inner" role="button" tabindex="0">
-      <div class="t" id="scrollCtaText">더치페이 계산해드릴게요!!</div>
+      <div class="t" id="scrollCtaText">스크롤해서 더치페이 확인해보세요!</div>
       <div class="chev" aria-hidden="true">⌄</div>
     </div>
   </div>
@@ -841,7 +841,7 @@
       const isZero = name.includes("ZERO");
 
       if (!met && !isZero) {
-        return { payback: 0, rate: 0, note: "※ 전월실적 미충족으로 이번 결제 혜택이 적용되지 않는 것으로 계산했습니다." };
+        return { payback: 0, rate: 0, note: "※ 전월실적 미충족으로 이번 결제 혜택이 적용되지 않는 것으로 계산했어." };
       }
 
       const now = new Date();
@@ -868,14 +868,14 @@
           note = "※ 가맹점 업종/월 한도/횟수 기준은 미반영이며, 보수적으로 계산했습니다.";
         } else if (category === "온라인" || category === "음식점" || category === "카페") {
           if (!isNight) {
-            return { payback: 0, rate: 0, note: "※ 해당 카드 혜택은 21:00~09:00 시간대에 더 유리한 것으로 계산했습니다." };
+            return { payback: 0, rate: 0, note: "※ 해당 카드 혜택은 21:00~09:00 시간대에 더 유리한 것으로 계산했어요." };
           }
           rate = 0.10;
           eligibleBase = 10000;
           cap = 1000;
-          note = "※ 21:00~09:00 시간대 기준으로 보수 계산했습니다(월 한도/횟수/대상 기준은 미반영).";
+          note = "※ 21:00~09:00 시간대 기준으로 보수 계산했어요(월 한도/횟수/대상 기준은 미반영).";
         } else {
-          return { payback: 0, rate: 0, note: "※ 현재 선택한 업종에서는 대표 혜택이 약한 것으로 계산했습니다." };
+          return { payback: 0, rate: 0, note: "※ 현재 선택한 업종에서는 대표 혜택이 약한 것으로 예측돼요." };
         }
 
         const base = Math.min(n, eligibleBase);
@@ -891,14 +891,14 @@
           const isStarbucks = (s.includes("스타벅스") || lower.includes("starbucks"));
 
           if (!isStarbucks) {
-            return { payback: 0, rate: 0, note: "※ 스타벅스 등 대상점이 확실하지 않아, 과대추정 방지를 위해 0원으로 계산했습니다." };
+            return { payback: 0, rate: 0, note: "※ 스타벅스 등 대상점이 확실하지 않아, 과대추정 방지를 위해 0원으로 계산했어요." };
           }
 
           rate = 0.50;
           cap = 10000;
           const raw = Math.floor(n * rate);
           const payback = Math.max(0, Math.min(raw, cap));
-          const capNote = (raw > cap) ? "※ 한도 때문에 10,000원까지만 반영했습니다. " : "";
+          const capNote = (raw > cap) ? "※ 한도 때문에 10,000원까지만 반영했어요. " : "";
           return { payback, rate, note: `${capNote}※ 스타벅스 결제 기준으로 계산했습니다(월 잔여한도/제외 항목은 미반영).` };
         }
 
@@ -908,7 +908,7 @@
           const raw = Math.floor(n * rate);
           const payback = Math.max(0, Math.min(raw, cap));
           const capNote = (raw > cap) ? "※ 한도 때문에 5,000원까지만 반영했습니다. " : "";
-          return { payback, rate, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며, 보수적으로 계산했습니다.` };
+          return { payback, rate, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며, 보수적으로 계산했어요.` };
         }
 
         if (category === "온라인") {
@@ -917,13 +917,13 @@
           const raw = Math.floor(n * rate);
           const payback = Math.max(0, Math.min(raw, cap));
           const capNote = (raw > cap) ? "※ 한도 때문에 5,000원까지만 반영했습니다. " : "";
-          return { payback, rate, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며, 보수적으로 계산했습니다.` };
+          return { payback, rate, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며, 보수적으로 계산했어요.` };
         }
 
-        return { payback: 0, rate: 0, note: "※ 현재 선택한 업종에서는 대표 혜택이 약한 것으로 계산했습니다." };
+        return { payback: 0, rate: 0, note: "※ 현재 선택한 업종에서는 대표 혜택이 약한 것으로 예측돼요" };
       }
 
-      return { payback: 0, rate: 0, note: "※ 현재 카드의 대표 혜택 적용 조건이 불확실하여 0원으로 계산했습니다." };
+      return { payback: 0, rate: 0, note: "※ 현재 카드의 대표 혜택 적용 조건이 불확실하여 0원으로 계산했어요." };
     }
 
     function computeScore(card, category, store){
@@ -979,7 +979,7 @@
     }
 
     function showScrollCTA(){
-      scrollCtaText.textContent = "더치페이 계산해드릴게요!!";
+      scrollCtaText.textContent = "스크롤해서 더치페이 확인해보세요!";
       scrollCta.style.display = "block";
       mainEl.classList.add("pad-bottom");
     }
@@ -1149,3 +1149,4 @@
   </script>
 </body>
 </html>
+
