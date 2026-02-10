@@ -375,7 +375,7 @@
       border: 1px solid rgba(255, 107, 0, 0.18);
     }
 
-    /* ✅ 추가: AI 예상 페이백 강조 (기존 UI 톤 유지) */
+    /* ✅ AI 예상 페이백 강조 (기존 UI 톤 유지) */
     .payback-highlight{
       margin-top: 10px;
       background: rgba(255,255,255,0.85);
@@ -484,11 +484,11 @@
       line-height: 1.45;
     }
 
-    /* ✅ 추가: 스크롤 유도 버튼 */
+    /* ✅ 스크롤 유도 CTA (투명/경량) */
     .scroll-cta {
       position: fixed;
       left: 50%;
-      bottom: 14px;
+      bottom: 10px;
       transform: translateX(-50%);
       z-index: 120;
       width: min(520px, calc(100% - 28px));
@@ -498,14 +498,13 @@
     .scroll-cta .inner {
       pointer-events: auto;
       width: 100%;
-      border: 1px solid rgba(255, 107, 0, 0.22);
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 22px rgba(16,24,40,0.12);
-      border-radius: 16px;
-      padding: 12px 14px;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      border-radius: 14px;
+      padding: 6px 8px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       gap: 10px;
       cursor: pointer;
@@ -514,34 +513,36 @@
     .scroll-cta .t {
       font-size: 13px;
       font-weight: 900;
-      color: var(--text);
+      color: var(--brand-dark);
       letter-spacing: -0.01em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      text-shadow: 0 6px 14px rgba(16,24,40,0.10);
     }
     .scroll-cta .a {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       font-size: 12px;
       font-weight: 900;
       color: var(--brand-dark);
       white-space: nowrap;
     }
     .scroll-cta .chev {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 999px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: var(--brand-weak);
-      border: 1px solid rgba(255,107,0,0.20);
+      background: rgba(255, 241, 230, 0.88);
+      border: 1px solid rgba(255,107,0,0.18);
       color: var(--brand-dark);
       font-size: 16px;
       line-height: 1;
       animation: jupupBop 1.6s ease-in-out infinite;
+      box-shadow: 0 10px 22px rgba(16,24,40,0.10);
     }
     @keyframes jupupBop {
       0%, 100% { transform: translateY(0); }
@@ -551,9 +552,9 @@
       .scroll-cta .chev{ animation: none; }
     }
 
-    /* 버튼이 겹치지 않게 하단 여백 확보 */
+    /* 버튼이 겹치지 않게 하단 여백 확보(최소) */
     .pad-bottom {
-      padding-bottom: 86px;
+      padding-bottom: 34px;
     }
   </style>
 </head>
@@ -625,12 +626,11 @@
     </div>
   </main>
 
-  <!-- ✅ 추가: 스크롤 유도 CTA -->
+  <!-- ✅ 스크롤 유도 CTA -->
   <div class="scroll-cta" id="scrollCta" aria-label="다음 카드 보기">
     <div class="inner" role="button" tabindex="0">
-      <div class="t" id="scrollCtaText">다음 카드도 확인해보세요</div>
+      <div class="t" id="scrollCtaText">스크롤 해서 다른 카드도 확인해보기!!</div>
       <div class="a">
-        <span>아래로</span>
         <span class="chev" aria-hidden="true">⌄</span>
       </div>
     </div>
@@ -795,7 +795,7 @@
     }
 
     /* =========================
-       ✅ 추가: 페이백 계산 로직 (보수적 고신뢰 모델)
+       ✅ 페이백 계산 로직 (보수적 고신뢰 모델)
        ========================= */
     function computePayback(card, category, amount, store){
       const n = Number(amount);
@@ -946,14 +946,14 @@
       hideScrollCTA();
     }
 
-    /* ✅ 추가: 스크롤 유도 CTA 동작 */
+    /* ✅ 스크롤 유도 CTA 동작 */
     function hideScrollCTA(){
       scrollCta.style.display = "none";
       mainEl.classList.remove("pad-bottom");
     }
 
     function showScrollCTA(){
-      scrollCtaText.textContent = "다음 카드도 확인해보세요";
+      scrollCtaText.textContent = "스크롤 해서 다른 카드도 확인해보기!!";
       scrollCta.style.display = "block";
       mainEl.classList.add("pad-bottom");
     }
@@ -962,18 +962,15 @@
       const cards = Array.from(resultsEl.querySelectorAll('.rec-card'));
       if (!cards.length) return;
 
-      // 현재 뷰포트 기준, 다음 카드 찾기
       const y = window.scrollY;
       const vh = window.innerHeight;
       let target = null;
 
       for (const el of cards){
         const top = el.getBoundingClientRect().top + window.scrollY;
-        // 화면 하단 근처(약간 아래)에 있는 첫 카드로 이동
         if (top > y + (vh * 0.55)) { target = el; break; }
       }
 
-      // 이미 아래쪽이면 결과 패널 끝으로 유도
       if (!target) target = cards[cards.length - 1];
 
       target.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -999,7 +996,6 @@
     window.addEventListener('scroll', () => {
       if (scrollCta.style.display !== "block") return;
 
-      // 마지막 카드가 충분히 보이면 CTA 숨김
       const cards = Array.from(resultsEl.querySelectorAll('.rec-card'));
       if (!cards.length) return;
       const last = cards[cards.length - 1];
