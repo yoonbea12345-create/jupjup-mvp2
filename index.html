@@ -737,7 +737,7 @@
         if (category === "음식점" || category === "편의점") rate = 0.015;
         else rate = 0.007;
         const rawZero = Math.floor(n * rate);
-        return { payback: Math.max(0, rawZero), rate, note: "※ 조건 없는 청구할인 기준(제외 항목/영역 기준은 미반영)." };
+        return { payback: Math.max(0, rawZero), rate, note: "" };
       }
 
       if (name.includes("Mr.Life")) {
@@ -748,7 +748,7 @@
           note = "※ 업종/월 한도/대상 기준은 미반영이며, 보수적으로 계산했습니다.";
         } else if (category === "온라인" || category === "음식점" || category === "카페") {
           if (!isNight) {
-            return { payback: 0, rate: 0, note: "※ 21:00~09:00 시간대에 더 유리한 것으로 계산했어요." };
+            return { payback: 0, rate: 0, note: "" };
           }
           rate = 0.10;
           eligibleBase = 10000;
@@ -771,7 +771,7 @@
           const isStarbucks = (s.includes("스타벅스") || lower.includes("starbucks"));
 
           if (!isStarbucks) {
-            return { payback: 0, rate: 0, note: "※ 대상점이 확실하지 않아 과대추정 방지를 위해 0원으로 계산했어요." };
+            return { payback: 0, rate: 0, note: "" };
           }
 
           rate = 0.50;
@@ -1014,4 +1014,5 @@
   </script>
 </body>
 </html>
+
 
