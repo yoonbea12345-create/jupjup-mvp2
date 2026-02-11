@@ -163,16 +163,6 @@
       white-space: nowrap;
     }
 
-    .notice {
-      background: var(--brand-weak);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: var(--brand-dark);
-      font-size: 13px;
-      font-weight: 800;
-      border: 1px solid rgba(255, 107, 0, 0.15);
-    }
-
     .panel {
       background: var(--card);
       border: 1px solid var(--line);
@@ -197,8 +187,7 @@
       margin-bottom: 6px;
     }
 
-    /* ✅ 입력 바(결제 장소/금액) 얇게 */
-    select, input {
+    select {
       width: 100%;
       padding: 10px 12px;
       border-radius: 10px;
@@ -209,7 +198,7 @@
       transition: all 0.2s;
       line-height: 1.2;
     }
-    select:focus, input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-weak); }
+    select:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-weak); }
 
     .btn {
       width: 100%;
@@ -318,10 +307,7 @@
       pointer-events:none;
     }
 
-    .rec-card.top > *{
-      position: relative;
-      z-index: 1;
-    }
+    .rec-card.top > *{ position: relative; z-index: 1; }
 
     @keyframes jupupBorderShine{
       0%   { background-position: 0% 50%; }
@@ -378,7 +364,6 @@
       border: 1px solid rgba(255, 107, 0, 0.18);
     }
 
-    /* ✅ AI 예상 페이백 강조 (기존 UI 톤 유지) */
     .payback-highlight{
       margin-top: 10px;
       background: rgba(255,255,255,0.85);
@@ -427,67 +412,6 @@
     .pop { animation: popIn 240ms ease both; }
     @keyframes popIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    .wm { display: none !important; }
-
-    /* ✅ 더치페이 UI (추천카드 랭킹 안에서만 사용) */
-    .dutch-box{
-      margin-top: 0;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 107, 0, 0.16);
-      background: var(--brand-weak);
-      padding: 10px;
-    }
-    .dutch-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:8px;
-      margin-bottom: 8px;
-    }
-    .dutch-title{
-      font-size: 12px;
-      font-weight: 900;
-      color: var(--brand-dark);
-      letter-spacing: -0.01em;
-    }
-    .dutch-total{
-      font-size: 11px;
-      font-weight: 900;
-      color: rgba(230,96,0,0.92);
-      white-space: nowrap;
-    }
-    .dutch-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    .dutch-item{
-      background: rgba(255,255,255,0.82);
-      border: 1px solid rgba(255,255,255,0.92);
-      border-radius: 12px;
-      padding: 10px;
-    }
-    .dutch-item .n{
-      font-size: 11px;
-      font-weight: 900;
-      color: var(--muted);
-      margin-bottom: 3px;
-    }
-    .dutch-item .amt{
-      font-size: 14px;
-      font-weight: 900;
-      color: var(--text);
-      letter-spacing: -0.02em;
-    }
-    .dutch-foot{
-      margin-top: 8px;
-      font-size: 11px;
-      font-weight: 800;
-      color: rgba(71, 84, 103, 0.92);
-      line-height: 1.45;
-    }
-
-    /* ✅ 스크롤 유도 CTA (영구 표시 + 더 생생하게) */
     .scroll-cta {
       position: fixed;
       left: 50%;
@@ -520,7 +444,6 @@
       animation: ctaFloat 2.2s ease-in-out infinite;
     }
 
-    /* 은은한 빛 스윕 */
     .scroll-cta .inner::before{
       content:"";
       position:absolute;
@@ -571,19 +494,16 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-3px); }
     }
-
     @keyframes ctaFloat {
       0%, 100% { transform: translateX(0) translateY(0); }
       50% { transform: translateX(0) translateY(-2px); }
     }
-
     @keyframes ctaSweep {
       0% { transform: translateX(-40%) rotate(18deg); opacity: 0; }
       30% { opacity: 0.9; }
       60% { opacity: 0.9; }
       100% { transform: translateX(190%) rotate(18deg); opacity: 0; }
     }
-
     @media (prefers-reduced-motion: reduce){
       .scroll-cta .inner{ animation: none; }
       .scroll-cta .inner::before{ animation: none; }
@@ -637,11 +557,6 @@
               <option value="기타">기타</option>
             </select>
           </div>
-
-          <div>
-            <label for="amountInput">결제(예상) 금액</label>
-            <input id="amountInput" type="text" inputmode="numeric" placeholder="결제금액에 따라 최대 혜택이 달라질 수 있어요" />
-          </div>
         </div>
 
         <button class="btn primary" id="btnRecommend">카드 추천받기</button>
@@ -655,27 +570,34 @@
         </div>
 
         <div id="results">
-          <div class="muted-center">잠들어 있는 숨은 내 카드 혜택을 깨워주세요!.</div>
+          <div class="muted-center">국민 1인당 카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>
         </div>
       </section>
     </div>
   </main>
 
-  <!-- ✅ 스크롤 유도 CTA -->
   <div class="scroll-cta" id="scrollCta" aria-label="다음 카드 보기">
     <div class="inner" role="button" tabindex="0">
-      <div class="t" id="scrollCtaText">스크롤해서 더치페이 확인해보세요!</div>
+      <div class="t" id="scrollCtaText">스크롤해서 다음 카드도 확인해보세요!</div>
       <div class="chev" aria-hidden="true">⌄</div>
     </div>
   </div>
 
   <script>
-    window.addEventListener('load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         const s = document.getElementById('splash');
+        if (!s) return;
         s.classList.add('fade-out');
-        setTimeout(() => s.style.display = 'none', 420);
+        setTimeout(() => { s.style.display = 'none'; }, 420);
       }, 900);
+
+      setTimeout(() => {
+        const s = document.getElementById('splash');
+        if (!s) return;
+        s.classList.add('fade-out');
+        setTimeout(() => { s.style.display = 'none'; }, 420);
+      }, 3000);
     });
 
     const params = new URLSearchParams(window.location.search);
@@ -692,22 +614,26 @@
       return map[s] || "";
     }
 
-    function digitsOnly(v){
-      return String(v || '').replace(/[^0-9]/g, '');
+    function formatKRWNumber(n){
+      const v = Number(n);
+      if (!Number.isFinite(v) || v <= 0) return "-";
+      return v.toLocaleString('ko-KR') + "원";
     }
 
-    function formatKRW(v){
-      const n = Number(digitsOnly(v));
-      if (!Number.isFinite(n) || n <= 0) return '';
-      return n.toLocaleString('ko-KR') + '원';
-    }
+    const AVG_PURCHASE_BY_CATEGORY = {
+      "카페": 7000,
+      "음식점": 15000,
+      "편의점": 8000,
+      "대중교통": 1500,
+      "온라인": 30000,
+      "기타": 20000
+    };
 
     const pFrom = (params.get('from') || '').trim().toLowerCase();
     const pStore = safeDecode(params.get('store') || '').trim();
     const pCategory = normalizeCategory(safeDecode(params.get('category') || '').trim());
 
     const categorySelect = document.getElementById('categorySelect');
-    const amountInput = document.getElementById('amountInput');
     const resultsEl = document.getElementById('results');
     const resultSub = document.getElementById('resultSub');
 
@@ -731,47 +657,6 @@
     if (pCategory) {
       categorySelect.value = pCategory;
     }
-
-    function buildDutchInline(n){
-      if (!Number.isFinite(n) || n <= 0) return null;
-
-      const wrap = document.createElement('div');
-      wrap.className = 'rec-card pop';
-      wrap.innerHTML = `
-        <div class="badge warn">더치페이 · 빠른 계산</div>
-        <div class="dutch-box" aria-label="더치페이 계산">
-          <div class="dutch-head">
-            <div class="dutch-title">더치페이 계산</div>
-            <div class="dutch-total">총액 ${n.toLocaleString('ko-KR')}원</div>
-          </div>
-          <div class="dutch-grid"></div>
-          <div class="dutch-foot">※ 1인당 금액은 원 단위 내림 기준입니다.</div>
-        </div>
-      `;
-
-      const grid = wrap.querySelector('.dutch-grid');
-      for (let people = 2; people <= 5; people++){
-        const per = Math.floor(n / people);
-        const remainder = n - (per * people);
-
-        const div = document.createElement('div');
-        div.className = 'dutch-item';
-        div.innerHTML = `
-          <div class="n">👥 ${people}명</div>
-          <div class="amt">${per.toLocaleString('ko-KR')}원</div>
-          <div style="margin-top:5px; font-size:11px; font-weight:800; color:rgba(71,84,103,0.9);">
-            남는 금액: ${remainder.toLocaleString('ko-KR')}원
-          </div>
-        `;
-        grid.appendChild(div);
-      }
-
-      return wrap;
-    }
-
-    amountInput.addEventListener('input', () => {
-      amountInput.value = digitsOnly(amountInput.value);
-    });
 
     const dummyCards = [
       {
@@ -827,10 +712,10 @@
       return card.rules.find(r => (r.category || []).includes(category)) || null;
     }
 
-    function computePayback(card, category, amount, store){
-      const n = Number(amount);
+    function computePaybackFromAvg(card, category, avgAmount, store){
+      const n = Number(avgAmount);
       if (!Number.isFinite(n) || n <= 0) {
-        return { payback: 0, rate: 0, note: "※ 결제금액 입력 시 AI 예상 페이백이 표시됩니다." };
+        return { payback: 0, rate: 0, note: "※ 평균 결제금액 기반으로 계산합니다." };
       }
 
       const req = Number(card.requirements?.monthlySpendMin || 0);
@@ -841,7 +726,7 @@
       const isZero = name.includes("ZERO");
 
       if (!met && !isZero) {
-        return { payback: 0, rate: 0, note: "※ 전월실적 미충족으로 이번 결제 혜택이 적용되지 않는 것으로 계산했어." };
+        return { payback: 0, rate: 0, note: "※ 전월실적 미충족으로 혜택이 적용되지 않는 것으로 계산했어요." };
       }
 
       const now = new Date();
@@ -865,17 +750,17 @@
           rate = 0.10;
           eligibleBase = 10000;
           cap = 1000;
-          note = "※ 가맹점 업종/월 한도/횟수 기준은 미반영이며, 보수적으로 계산했습니다.";
+          note = "※ 업종/월 한도/대상 기준은 미반영이며, 보수적으로 계산했습니다.";
         } else if (category === "온라인" || category === "음식점" || category === "카페") {
           if (!isNight) {
-            return { payback: 0, rate: 0, note: "※ 해당 카드 혜택은 21:00~09:00 시간대에 더 유리한 것으로 계산했어요." };
+            return { payback: 0, rate: 0, note: "※ 21:00~09:00 시간대에 더 유리한 것으로 계산했어요." };
           }
           rate = 0.10;
           eligibleBase = 10000;
           cap = 1000;
-          note = "※ 21:00~09:00 시간대 기준으로 보수 계산했어요(월 한도/횟수/대상 기준은 미반영).";
+          note = "※ 21:00~09:00 시간대 기준 보수 계산(월 한도/대상 기준 미반영).";
         } else {
-          return { payback: 0, rate: 0, note: "※ 현재 선택한 업종에서는 대표 혜택이 약한 것으로 예측돼요." };
+          return { payback: 0, rate: 0, note: "※ 현재 업종에서는 대표 혜택이 약한 것으로 예측돼요." };
         }
 
         const base = Math.min(n, eligibleBase);
@@ -891,7 +776,7 @@
           const isStarbucks = (s.includes("스타벅스") || lower.includes("starbucks"));
 
           if (!isStarbucks) {
-            return { payback: 0, rate: 0, note: "※ 스타벅스 등 대상점이 확실하지 않아, 과대추정 방지를 위해 0원으로 계산했어요." };
+            return { payback: 0, rate: 0, note: "※ 대상점이 확실하지 않아 과대추정 방지를 위해 0원으로 계산했어요." };
           }
 
           rate = 0.50;
@@ -899,7 +784,7 @@
           const raw = Math.floor(n * rate);
           const payback = Math.max(0, Math.min(raw, cap));
           const capNote = (raw > cap) ? "※ 한도 때문에 10,000원까지만 반영했어요. " : "";
-          return { payback, rate, note: `${capNote}※ 스타벅스 결제 기준으로 계산했습니다(월 잔여한도/제외 항목은 미반영).` };
+          return { payback, rate, note: `${capNote}※ 스타벅스 결제 기준(월 잔여한도/제외 항목 미반영).` };
         }
 
         if (category === "대중교통") {
@@ -908,7 +793,7 @@
           const raw = Math.floor(n * rate);
           const payback = Math.max(0, Math.min(raw, cap));
           const capNote = (raw > cap) ? "※ 한도 때문에 5,000원까지만 반영했습니다. " : "";
-          return { payback, rate, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며, 보수적으로 계산했어요.` };
+          return { payback, rate, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며 보수 계산했어요.` };
         }
 
         if (category === "온라인") {
@@ -917,13 +802,13 @@
           const raw = Math.floor(n * rate);
           const payback = Math.max(0, Math.min(raw, cap));
           const capNote = (raw > cap) ? "※ 한도 때문에 5,000원까지만 반영했습니다. " : "";
-          return { payback, rate, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며, 보수적으로 계산했어요.` };
+          return { payback, rate, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며 보수 계산했어요.` };
         }
 
-        return { payback: 0, rate: 0, note: "※ 현재 선택한 업종에서는 대표 혜택이 약한 것으로 예측돼요" };
+        return { payback: 0, rate: 0, note: "※ 현재 업종에서는 대표 혜택이 약한 것으로 예측돼요." };
       }
 
-      return { payback: 0, rate: 0, note: "※ 현재 카드의 대표 혜택 적용 조건이 불확실하여 0원으로 계산했어요." };
+      return { payback: 0, rate: 0, note: "※ 대표 혜택 적용 조건이 불확실하여 0원으로 계산했어요." };
     }
 
     function computeScore(card, category, store){
@@ -963,13 +848,14 @@
     }
 
     function showIdleResults(){
-      resultsEl.innerHTML = '<div class="muted-center"> 카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>';
+      resultsEl.innerHTML = '<div class="muted-center">국민 1인당 카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>';
       resultSub.textContent = "";
       hideScrollCTA();
     }
 
     function showLoadingResults(){
-      resultsEl.innerHTML = '<div class="muted-center">1초만 기다려주세요!</div>';
+      // ✅ 문구 수정(요청)
+      resultsEl.innerHTML = '<div class="muted-center">결제 장소에 맞는 최적의 카드를 조회 중이에요!</div>';
       hideScrollCTA();
     }
 
@@ -979,7 +865,7 @@
     }
 
     function showScrollCTA(){
-      scrollCtaText.textContent = "스크롤해서 더치페이 확인해보세요!";
+      scrollCtaText.textContent = "스크롤해서 다음 카드도 확인해보세요!";
       scrollCta.style.display = "block";
       mainEl.classList.add("pad-bottom");
     }
@@ -998,7 +884,6 @@
       }
 
       if (!target) target = cards[cards.length - 1];
-
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
@@ -1026,22 +911,19 @@
         return;
       }
 
-      const amountText = formatKRW(amountInput.value);
+      const storeForScore = (pStore || "스타벅스");
+      const avgAmt = Number(AVG_PURCHASE_BY_CATEGORY[cat] || 15000);
+
       const ctx = [cat];
       if (pFrom === "qr" || pCategory) ctx.push("QR 진입");
-      if (amountText) ctx.push(amountText);
+      ctx.push(`평균 결제 ${formatKRWNumber(avgAmt)}`);
       resultSub.textContent = ctx.join(" · ");
-
-      const storeForScore = (pStore || "스타벅스");
 
       const ranked = dummyCards
         .map(card => ({ card, ...computeScore(card, cat, storeForScore) }))
         .sort((a,b) => b.score - a.score);
 
       resultsEl.innerHTML = "";
-
-      const nForDutch = Number(digitsOnly(amountInput.value));
-      const dutchInline = (!Number.isFinite(nForDutch) || nForDutch <= 0) ? null : buildDutchInline(nForDutch);
 
       ranked.forEach((item, idx) => {
         const { card, score, met, rule, req, spent } = item;
@@ -1056,24 +938,20 @@
         const benefitText = rule?.benefit || card.fallback;
         const whyText = (idx === 0) ? buildWhyText(item, cat, pStore || "") : "";
 
-        const amt = Number(digitsOnly(amountInput.value));
-        const pb = computePayback(card, cat, amt, pStore || "");
+        const pb = computePaybackFromAvg(card, cat, avgAmt, pStore || "");
+        const ratePct = Math.max(0, pb.rate * 100);
 
-        const paybackHtml = (!Number.isFinite(amt) || amt <= 0) ? `
+        const paybackHtml = `
           <div class="payback-highlight">
             <div class="payback-top">
-              <div class="payback-label">AI 예상 페이백</div>
-              <div class="payback-amt">-</div>
+              <div class="payback-label">예상 할인율</div>
+              <div class="payback-amt">${ratePct ? ratePct.toFixed(ratePct >= 1 ? 0 : 1) : "0"}%</div>
             </div>
-            <div class="payback-foot">${pb.note}</div>
-          </div>
-        ` : `
-          <div class="payback-highlight">
-            <div class="payback-top">
-              <div class="payback-label">AI 예상 페이백</div>
+            <div class="payback-top" style="margin-top:2px;">
+              <div class="payback-label">평균 결제 대비 할인금액</div>
               <div class="payback-amt">${pb.payback.toLocaleString('ko-KR')}원</div>
             </div>
-            <div class="payback-foot">${pb.note}</div>
+            <div class="payback-foot">※ 1인당 평균 결제금액 ${formatKRWNumber(avgAmt)} 기준. ${pb.note}</div>
           </div>
         `;
 
@@ -1088,10 +966,6 @@
           ${paybackHtml}
         `;
         resultsEl.appendChild(div);
-
-        if (idx === 1 && dutchInline) {
-          resultsEl.appendChild(dutchInline);
-        }
       });
 
       attachScrollCTA();
@@ -1132,9 +1006,7 @@
 
     btnReset.addEventListener('click', () => {
       categorySelect.value = pCategory || "";
-      amountInput.value = "";
       hasRecommended = false;
-
       showIdleResults();
       refreshCTA();
     });
