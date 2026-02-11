@@ -670,12 +670,22 @@
   </div>
 
   <script>
-    window.addEventListener('load', () => {
+    // ✅ 스플래시: load 대신 DOMContentLoaded로 변경(이미지 404여도 넘어가게)
+    document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         const s = document.getElementById('splash');
+        if (!s) return;
         s.classList.add('fade-out');
-        setTimeout(() => s.style.display = 'none', 420);
+        setTimeout(() => { s.style.display = 'none'; }, 420);
       }, 900);
+
+      // ✅ 안전장치: 어떤 이유로든 3초 후 강제 종료
+      setTimeout(() => {
+        const s = document.getElementById('splash');
+        if (!s) return;
+        s.classList.add('fade-out');
+        setTimeout(() => { s.style.display = 'none'; }, 420);
+      }, 3000);
     });
 
     const params = new URLSearchParams(window.location.search);
@@ -963,13 +973,14 @@
     }
 
     function showIdleResults(){
-      resultsEl.innerHTML = '<div class="muted-center">카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>';
+      // ✅ 문구 수정(요청)
+      resultsEl.innerHTML = '<div class="muted-center">국민 1인당 카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>';
       resultSub.textContent = "";
       hideScrollCTA();
     }
 
     function showLoadingResults(){
-      resultsEl.innerHTML = '<div class="muted-center">'카페지유'에 꼭 맞는 카드를 조회중이에요!</div>';
+      resultsEl.innerHTML = '<div class="muted-center">1초만 기다려주세요!</div>';
       hideScrollCTA();
     }
 
@@ -998,7 +1009,6 @@
       }
 
       if (!target) target = cards[cards.length - 1];
-
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
@@ -1149,4 +1159,3 @@
   </script>
 </body>
 </html>
-
