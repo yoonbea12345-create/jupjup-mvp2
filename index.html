@@ -364,16 +364,16 @@
       border: 1px solid rgba(255, 107, 0, 0.18);
     }
 
-    /* ✅ (수정) 하단 주석 제거 + 바 높이(빈공간) 축소 */
+    /* ✅ (유지) 하단 주석 제거 + 바 높이(빈공간) 축소 */
     .payback-highlight{
-      margin-top: 8px; /* 10px -> 8px */
+      margin-top: 8px;
       background: rgba(255,255,255,0.85);
       border: 1px solid rgba(255, 107, 0, 0.18);
       border-radius: 12px;
-      padding: 8px 10px; /* 12px 12px -> 8px 10px */
+      padding: 8px 10px;
       display:flex;
       flex-direction: column;
-      gap: 4px; /* 6px -> 4px */
+      gap: 4px;
     }
     .payback-top{
       display:flex;
@@ -394,12 +394,6 @@
       color: var(--brand-dark);
       letter-spacing: -0.02em;
       white-space: nowrap;
-    }
-    .payback-foot{
-      font-size: 11px;
-      font-weight: 800;
-      color: rgba(71, 84, 103, 0.92);
-      line-height: 1.45;
     }
 
     .muted-center {
@@ -571,7 +565,7 @@
         </div>
 
         <div id="results">
-          <div class="muted-center">카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>
+          <div class="muted-center">국민 1인당 카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>
         </div>
       </section>
     </div>
@@ -585,6 +579,15 @@
   </div>
 
   <script>
+    /*
+      [랭킹 로직 변경(불가피) 라인 단위 명시]
+      - 변경 사유: 21~09시가 아니면 Mr.Life(야간 혜택) payback이 0원으로 떨어져 UX가 나빠짐.
+                 반대로 현대 ZERO는 항상 0.7% 이상(카테고리별 1.5% 포함)이라 주간에는 1순위가 더 쾌적함.
+      - 변경 내용(최소): computeScore/findRule/badgeByScore/buildWhyText/카드 구조/WHY/배지/표시 구조는 그대로 두고,
+                        renderResults()의 정렬 기준에만 "시간대 보정 boost"를 추가함.
+                        (점수 계산 자체는 유지, 정렬용 sortKey만 추가)
+    */
+
     document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         const s = document.getElementById('splash');
@@ -707,7 +710,7 @@
       return card.rules.find(r => (r.category || []).includes(category)) || null;
     }
 
-    // ✅ (변경) 기준 결제금액(BASE_AMOUNT=5000)으로 할인금액 산출
+    // ✅ (유지) 기준 결제금액(BASE_AMOUNT=5000)으로 할인금액 산출
     function computePaybackFromBase(card, category, baseAmount, store){
       const n = Number(baseAmount);
       if (!Number.isFinite(n) || n <= 0) {
@@ -844,7 +847,7 @@
     }
 
     function showIdleResults(){
-      resultsEl.innerHTML = '<div class="muted-center">카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>';
+      resultsEl.innerHTML = '<div class="muted-center">국민 1인당 카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>';
       resultSub.textContent = "";
       hideScrollCTA();
     }
@@ -899,6 +902,23 @@
       }
     });
 
+    /* ✅ (추가, 최소) 사용자 기기 시간대 기준 야간 판정 */
+    function isNightNow(){
+      const h = new Date().getHours();
+      return (h >= 21 || h < 9);
+    }
+
+    /* ✅ (추가, 최소) 시간대 UX 보정용 정렬 boost (점수 계산/WHY/배지 구조는 유지) */
+    function sortBoostForUX(card, isNight){
+      const name = String(card?.name || "");
+      const isMrLife = name.includes("Mr.Life");
+      const isZero = name.includes("ZERO");
+      if (isNight) {
+        return isMrLife ? 1000 : 0;   // 21~09시: Mr.Life를 1순위로
+      }
+      return isZero ? 1000 : 0;       // 그 외: 현대 ZERO를 1순위로
+    }
+
     function renderResults(){
       const cat = categorySelect.value;
       if (!cat) {
@@ -912,9 +932,15 @@
       if (pFrom === "qr" || pCategory) ctx.push("QR 진입");
       resultSub.textContent = ctx.join(" · ");
 
+      const night = isNightNow();
+
       const ranked = dummyCards
-        .map(card => ({ card, ...computeScore(card, cat, storeForScore) }))
-        .sort((a,b) => b.score - a.score);
+        .map(card => {
+          const base = computeScore(card, cat, storeForScore);
+          const boost = sortBoostForUX(card, night);
+          return { card, ...base, __sortKey: (base.score + boost) };
+        })
+        .sort((a,b) => b.__sortKey - a.__sortKey);
 
       resultsEl.innerHTML = "";
 
@@ -931,11 +957,10 @@
         const benefitText = rule?.benefit || card.fallback;
         const whyText = (idx === 0) ? buildWhyText(item, cat, pStore || "") : "";
 
-        // ✅ (변경) 5,000원 결제 기준으로 할인율/할인금액 산출
         const pb = computePaybackFromBase(card, cat, BASE_AMOUNT, pStore || "");
         const ratePct = Math.max(0, pb.rate * 100);
 
-        // ✅ (수정) 하단 주석(※ pb.note) 제거, "예상 할인율/5,000원 대비 할인금액"만 표시
+        // ✅ (유지) "예상 할인율 / 5,000원 결제 대비 할인금액"만 표시 (하단 주석 제거)
         const paybackHtml = `
           <div class="payback-highlight">
             <div class="payback-top">
