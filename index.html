@@ -364,15 +364,16 @@
       border: 1px solid rgba(255, 107, 0, 0.18);
     }
 
+    /* ✅ (수정) 하단 주석 제거 + 바 높이(빈공간) 축소 */
     .payback-highlight{
-      margin-top: 10px;
+      margin-top: 8px; /* 10px -> 8px */
       background: rgba(255,255,255,0.85);
       border: 1px solid rgba(255, 107, 0, 0.18);
       border-radius: 12px;
-      padding: 12px 12px;
+      padding: 8px 10px; /* 12px 12px -> 8px 10px */
       display:flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px; /* 6px -> 4px */
     }
     .payback-top{
       display:flex;
@@ -934,6 +935,7 @@
         const pb = computePaybackFromBase(card, cat, BASE_AMOUNT, pStore || "");
         const ratePct = Math.max(0, pb.rate * 100);
 
+        // ✅ (수정) 하단 주석(※ pb.note) 제거, "예상 할인율/5,000원 대비 할인금액"만 표시
         const paybackHtml = `
           <div class="payback-highlight">
             <div class="payback-top">
@@ -944,7 +946,6 @@
               <div class="payback-label">5,000원 결제 대비 할인금액</div>
               <div class="payback-amt">${pb.payback.toLocaleString('ko-KR')}원</div>
             </div>
-            <div class="payback-foot">※ ${pb.note}</div>
           </div>
         `;
 
@@ -1014,5 +1015,3 @@
   </script>
 </body>
 </html>
-
-
