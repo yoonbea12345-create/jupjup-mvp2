@@ -638,7 +638,10 @@
             </select>
           </div>
 
-          <!-- ✅ 결제금액 입력란 삭제 (요구사항 반영) -->
+          <div>
+            <label for="amountInput">결제(예상) 금액</label>
+            <input id="amountInput" type="text" inputmode="numeric" placeholder="결제금액에 따라 최대 혜택이 달라질 수 있어요" />
+          </div>
         </div>
 
         <button class="btn primary" id="btnRecommend">카드 추천받기</button>
@@ -689,11 +692,22 @@
       return map[s] || "";
     }
 
+    function digitsOnly(v){
+      return String(v || '').replace(/[^0-9]/g, '');
+    }
+
+    function formatKRW(v){
+      const n = Number(digitsOnly(v));
+      if (!Number.isFinite(n) || n <= 0) return '';
+      return n.toLocaleString('ko-KR') + '원';
+    }
+
     const pFrom = (params.get('from') || '').trim().toLowerCase();
     const pStore = safeDecode(params.get('store') || '').trim();
     const pCategory = normalizeCategory(safeDecode(params.get('category') || '').trim());
 
     const categorySelect = document.getElementById('categorySelect');
+    const amountInput = document.getElementById('amountInput');
     const resultsEl = document.getElementById('results');
     const resultSub = document.getElementById('resultSub');
 
@@ -716,33 +730,6 @@
 
     if (pCategory) {
       categorySelect.value = pCategory;
-    }
-
-    function formatKRWNumber(n){
-      const v = Number(n);
-      if (!Number.isFinite(v) || v <= 0) return '-';
-      return v.toLocaleString('ko-KR') + '원';
-    }
-
-
-    // ✅ 결제금액 입력 제거 이후: 카테고리별 1인 평균 구매액(추정)
-    function getAvgPurchaseAmount(category, store){
-      const s = (store || "").toLowerCase();
-      const isStarbucks = (s.includes("스타벅스") || s.includes("starbucks"));
-
-      const base = {
-        "카페": 18000,
-        "음식점": 25000,
-        "편의점": 12000,
-        "대중교통": 2800,
-        "온라인": 45000,
-        "기타": 20000
-      };
-
-      let amt = base[category] ?? 20000;
-      if (category === "카페" && isStarbucks) amt = 22000;
-
-      return amt;
     }
 
     function buildDutchInline(n){
@@ -781,6 +768,10 @@
 
       return wrap;
     }
+
+    amountInput.addEventListener('input', () => {
+      amountInput.value = digitsOnly(amountInput.value);
+    });
 
     const dummyCards = [
       {
@@ -839,7 +830,7 @@
     function computePayback(card, category, amount, store){
       const n = Number(amount);
       if (!Number.isFinite(n) || n <= 0) {
-        return { payback: 0, rate: 0, effectiveRate: 0, baseAmount: 0, note: "※ 평균 구매액 추정치를 기반으로 보수적으로 계산합니다." };
+        return { payback: 0, rate: 0, note: "※ 결제금액 입력 시 AI 예상 페이백이 표시됩니다." };
       }
 
       const req = Number(card.requirements?.monthlySpendMin || 0);
@@ -850,7 +841,7 @@
       const isZero = name.includes("ZERO");
 
       if (!met && !isZero) {
-        return { payback: 0, rate: 0, effectiveRate: 0, baseAmount: n, note: "※ 전월실적 미충족으로 혜택이 적용되지 않는 것으로 보수 계산했습니다." };
+        return { payback: 0, rate: 0, note: "※ 전월실적 미충족으로 이번 결제 혜택이 적용되지 않는 것으로 계산했어." };
       }
 
       const now = new Date();
@@ -866,9 +857,7 @@
         if (category === "음식점" || category === "편의점") rate = 0.015;
         else rate = 0.007;
         const rawZero = Math.floor(n * rate);
-        const payback = Math.max(0, rawZero);
-        const effectiveRate = n > 0 ? (payback / n) : 0;
-        return { payback, rate, effectiveRate, baseAmount: n, note: "※ 조건 없는 청구할인 기준(제외 항목/영역 기준은 미반영)으로 보수 계산했습니다." };
+        return { payback: Math.max(0, rawZero), rate, note: "※ 조건 없는 청구할인 기준(제외 항목/영역 기준은 미반영)." };
       }
 
       if (name.includes("Mr.Life")) {
@@ -879,21 +868,20 @@
           note = "※ 가맹점 업종/월 한도/횟수 기준은 미반영이며, 보수적으로 계산했습니다.";
         } else if (category === "온라인" || category === "음식점" || category === "카페") {
           if (!isNight) {
-            return { payback: 0, rate: 0, effectiveRate: 0, baseAmount: n, note: "※ 해당 카드 혜택은 21:00~09:00 시간대가 더 유리한 것으로 보수 계산했습니다." };
+            return { payback: 0, rate: 0, note: "※ 해당 카드 혜택은 21:00~09:00 시간대에 더 유리한 것으로 계산했어요." };
           }
           rate = 0.10;
           eligibleBase = 10000;
           cap = 1000;
-          note = "※ 21:00~09:00 시간대 기준으로 보수 계산했습니다(월 한도/횟수/대상 기준은 미반영).";
+          note = "※ 21:00~09:00 시간대 기준으로 보수 계산했어요(월 한도/횟수/대상 기준은 미반영).";
         } else {
-          return { payback: 0, rate: 0, effectiveRate: 0, baseAmount: n, note: "※ 현재 선택 업종에서는 대표 혜택이 약한 것으로 예측됩니다." };
+          return { payback: 0, rate: 0, note: "※ 현재 선택한 업종에서는 대표 혜택이 약한 것으로 예측돼요." };
         }
 
         const base = Math.min(n, eligibleBase);
         const raw = Math.floor(base * rate);
         const payback = Math.max(0, Math.min(raw, cap));
-        const effectiveRate = n > 0 ? (payback / n) : 0;
-        return { payback, rate, effectiveRate, baseAmount: n, note };
+        return { payback, rate, note };
       }
 
       if (name.includes("taptap O")) {
@@ -903,16 +891,15 @@
           const isStarbucks = (s.includes("스타벅스") || lower.includes("starbucks"));
 
           if (!isStarbucks) {
-            return { payback: 0, rate: 0, effectiveRate: 0, baseAmount: n, note: "※ 대상점이 확실하지 않아 과대추정 방지를 위해 0원으로 계산했습니다." };
+            return { payback: 0, rate: 0, note: "※ 스타벅스 등 대상점이 확실하지 않아, 과대추정 방지를 위해 0원으로 계산했어요." };
           }
 
           rate = 0.50;
           cap = 10000;
           const raw = Math.floor(n * rate);
           const payback = Math.max(0, Math.min(raw, cap));
-          const effectiveRate = n > 0 ? (payback / n) : 0;
-          const capNote = (raw > cap) ? "※ 한도 때문에 10,000원까지만 반영했습니다. " : "";
-          return { payback, rate, effectiveRate, baseAmount: n, note: `${capNote}※ 스타벅스 결제 기준으로 보수 계산했습니다(월 잔여한도/제외 항목은 미반영).` };
+          const capNote = (raw > cap) ? "※ 한도 때문에 10,000원까지만 반영했어요. " : "";
+          return { payback, rate, note: `${capNote}※ 스타벅스 결제 기준으로 계산했습니다(월 잔여한도/제외 항목은 미반영).` };
         }
 
         if (category === "대중교통") {
@@ -920,9 +907,8 @@
           cap = 5000;
           const raw = Math.floor(n * rate);
           const payback = Math.max(0, Math.min(raw, cap));
-          const effectiveRate = n > 0 ? (payback / n) : 0;
           const capNote = (raw > cap) ? "※ 한도 때문에 5,000원까지만 반영했습니다. " : "";
-          return { payback, rate, effectiveRate, baseAmount: n, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며, 보수적으로 계산했습니다.` };
+          return { payback, rate, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며, 보수적으로 계산했어요.` };
         }
 
         if (category === "온라인") {
@@ -930,15 +916,14 @@
           cap = 5000;
           const raw = Math.floor(n * rate);
           const payback = Math.max(0, Math.min(raw, cap));
-          const effectiveRate = n > 0 ? (payback / n) : 0;
           const capNote = (raw > cap) ? "※ 한도 때문에 5,000원까지만 반영했습니다. " : "";
-          return { payback, rate, effectiveRate, baseAmount: n, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며, 보수적으로 계산했습니다.` };
+          return { payback, rate, note: `${capNote}※ 전월실적/월 한도/대상 기준은 미반영이며, 보수적으로 계산했어요.` };
         }
 
-        return { payback: 0, rate: 0, effectiveRate: 0, baseAmount: n, note: "※ 현재 선택 업종에서는 대표 혜택이 약한 것으로 예측됩니다." };
+        return { payback: 0, rate: 0, note: "※ 현재 선택한 업종에서는 대표 혜택이 약한 것으로 예측돼요" };
       }
 
-      return { payback: 0, rate: 0, effectiveRate: 0, baseAmount: n, note: "※ 대표 혜택 적용 조건이 불확실하여 0원으로 보수 계산했습니다." };
+      return { payback: 0, rate: 0, note: "※ 현재 카드의 대표 혜택 적용 조건이 불확실하여 0원으로 계산했어요." };
     }
 
     function computeScore(card, category, store){
@@ -978,11 +963,7 @@
     }
 
     function showIdleResults(){
-      // ✅ 요청: 국민 평균 기반 'n만원' 계산 → 문구에 삽입
-      const lossWon = calcAvgLossWonPerPersonMonthly();
-      const lossManwon = wonToManwonText(lossWon);
-
-      resultsEl.innerHTML = `<div class="muted-center"> 카드혜택/포인트 미사용으로 인해 매월 약 1.2만원의 손실액이 발생해요!</div>`;
+      resultsEl.innerHTML = '<div class="muted-center">국민 1인당 카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>';
       resultSub.textContent = "";
       hideScrollCTA();
     }
@@ -1045,12 +1026,13 @@
         return;
       }
 
+      const amountText = formatKRW(amountInput.value);
       const ctx = [cat];
       if (pFrom === "qr" || pCategory) ctx.push("QR 진입");
+      if (amountText) ctx.push(amountText);
       resultSub.textContent = ctx.join(" · ");
 
       const storeForScore = (pStore || "스타벅스");
-      const avgAmount = getAvgPurchaseAmount(cat, pStore || "");
 
       const ranked = dummyCards
         .map(card => ({ card, ...computeScore(card, cat, storeForScore) }))
@@ -1058,7 +1040,8 @@
 
       resultsEl.innerHTML = "";
 
-      const dutchInline = null;
+      const nForDutch = Number(digitsOnly(amountInput.value));
+      const dutchInline = (!Number.isFinite(nForDutch) || nForDutch <= 0) ? null : buildDutchInline(nForDutch);
 
       ranked.forEach((item, idx) => {
         const { card, score, met, rule, req, spent } = item;
@@ -1073,22 +1056,24 @@
         const benefitText = rule?.benefit || card.fallback;
         const whyText = (idx === 0) ? buildWhyText(item, cat, pStore || "") : "";
 
-        const pb = computePayback(card, cat, avgAmount, pStore || "");
-        const effectivePct = Math.round((pb.effectiveRate || 0) * 1000) / 10;
-        const ratePct = Math.round((pb.rate || 0) * 1000) / 10;
+        const amt = Number(digitsOnly(amountInput.value));
+        const pb = computePayback(card, cat, amt, pStore || "");
 
-        const paybackHtml = `
+        const paybackHtml = (!Number.isFinite(amt) || amt <= 0) ? `
           <div class="payback-highlight">
             <div class="payback-top">
               <div class="payback-label">AI 예상 페이백</div>
-              <div class="payback-amt">${formatKRWNumber(pb.payback)}</div>
+              <div class="payback-amt">-</div>
             </div>
-            <div class="payback-foot">
-              할인율: ${effectivePct}%${(pb.rate && pb.rate !== pb.effectiveRate) ? ` (명목 ${ratePct}%)` : ``}<br/>
-              1인 평균 구매액: ${formatKRWNumber(avgAmount)} · 평균 환산액: ${formatKRWNumber(pb.payback)}<br/>
-              1인 평균 구매액 대비 할인금액: ${formatKRWNumber(pb.payback)}<br/>
-              ${pb.note}
+            <div class="payback-foot">${pb.note}</div>
+          </div>
+        ` : `
+          <div class="payback-highlight">
+            <div class="payback-top">
+              <div class="payback-label">AI 예상 페이백</div>
+              <div class="payback-amt">${pb.payback.toLocaleString('ko-KR')}원</div>
             </div>
+            <div class="payback-foot">${pb.note}</div>
           </div>
         `;
 
@@ -1147,6 +1132,7 @@
 
     btnReset.addEventListener('click', () => {
       categorySelect.value = pCategory || "";
+      amountInput.value = "";
       hasRecommended = false;
 
       showIdleResults();
@@ -1163,5 +1149,3 @@
   </script>
 </body>
 </html>
-
-
