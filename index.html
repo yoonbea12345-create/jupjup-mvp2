@@ -570,7 +570,7 @@
         </div>
 
         <div id="results">
-          <div class="muted-center">카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>
+          <div class="muted-center">국민 1인당 카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>
         </div>
       </section>
     </div>
@@ -620,15 +620,6 @@
       return v.toLocaleString('ko-KR') + "원";
     }
 
-    const AVG_PURCHASE_BY_CATEGORY = {
-      "카페": 7000,
-      "음식점": 15000,
-      "편의점": 8000,
-      "대중교통": 1500,
-      "온라인": 30000,
-      "기타": 20000
-    };
-
     const pFrom = (params.get('from') || '').trim().toLowerCase();
     const pStore = safeDecode(params.get('store') || '').trim();
     const pCategory = normalizeCategory(safeDecode(params.get('category') || '').trim());
@@ -657,6 +648,9 @@
     if (pCategory) {
       categorySelect.value = pCategory;
     }
+
+    // ✅ 고정 기준 결제금액: 5,000원 (요청 반영)
+    const BASE_AMOUNT = 5000;
 
     const dummyCards = [
       {
@@ -712,10 +706,11 @@
       return card.rules.find(r => (r.category || []).includes(category)) || null;
     }
 
-    function computePaybackFromAvg(card, category, avgAmount, store){
-      const n = Number(avgAmount);
+    // ✅ (변경) 기준 결제금액(BASE_AMOUNT=5000)으로 할인금액 산출
+    function computePaybackFromBase(card, category, baseAmount, store){
+      const n = Number(baseAmount);
       if (!Number.isFinite(n) || n <= 0) {
-        return { payback: 0, rate: 0, note: "※ 평균 결제금액 기반으로 계산합니다." };
+        return { payback: 0, rate: 0, note: "※ 기준 결제금액 기반으로 계산합니다." };
       }
 
       const req = Number(card.requirements?.monthlySpendMin || 0);
@@ -848,13 +843,12 @@
     }
 
     function showIdleResults(){
-      resultsEl.innerHTML = '<div class="muted-center">카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>';
+      resultsEl.innerHTML = '<div class="muted-center">국민 1인당 카드 혜택/포인트 미사용으로 인해 매월 약 1.3만원의 손실액이 발생해요!</div>';
       resultSub.textContent = "";
       hideScrollCTA();
     }
 
     function showLoadingResults(){
-      // ✅ 문구 수정(요청)
       resultsEl.innerHTML = '<div class="muted-center">결제 장소에 맞는 최적의 카드를 조회 중이에요!</div>';
       hideScrollCTA();
     }
@@ -912,11 +906,9 @@
       }
 
       const storeForScore = (pStore || "스타벅스");
-      const avgAmt = Number(AVG_PURCHASE_BY_CATEGORY[cat] || 15000);
 
       const ctx = [cat];
       if (pFrom === "qr" || pCategory) ctx.push("QR 진입");
-      ctx.push(`평균 결제 ${formatKRWNumber(avgAmt)}`);
       resultSub.textContent = ctx.join(" · ");
 
       const ranked = dummyCards
@@ -938,7 +930,8 @@
         const benefitText = rule?.benefit || card.fallback;
         const whyText = (idx === 0) ? buildWhyText(item, cat, pStore || "") : "";
 
-        const pb = computePaybackFromAvg(card, cat, avgAmt, pStore || "");
+        // ✅ (변경) 5,000원 결제 기준으로 할인율/할인금액 산출
+        const pb = computePaybackFromBase(card, cat, BASE_AMOUNT, pStore || "");
         const ratePct = Math.max(0, pb.rate * 100);
 
         const paybackHtml = `
@@ -948,10 +941,10 @@
               <div class="payback-amt">${ratePct ? ratePct.toFixed(ratePct >= 1 ? 0 : 1) : "0"}%</div>
             </div>
             <div class="payback-top" style="margin-top:2px;">
-              <div class="payback-label">평균 결제 대비 할인금액</div>
+              <div class="payback-label">5,000원 결제 대비 할인금액</div>
               <div class="payback-amt">${pb.payback.toLocaleString('ko-KR')}원</div>
             </div>
-            <div class="payback-foot">※ 1인당 평균 결제금액 ${formatKRWNumber(avgAmt)} 기준. ${pb.note}</div>
+            <div class="payback-foot">※ ${pb.note}</div>
           </div>
         `;
 
@@ -1021,4 +1014,3 @@
   </script>
 </body>
 </html>
-
